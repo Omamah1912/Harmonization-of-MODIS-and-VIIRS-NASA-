@@ -1,0 +1,12 @@
+requests
+pandas
+pyarrow
+duckdb
+numpy
+shapely
+geopandas
+fastapi
+uvicorn
+pytest
+httpx
+python-dotenv

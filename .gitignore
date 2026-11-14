@@ -1,0 +1,12 @@
+.env
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+node_modules/
+dist/
+data/raw/
+data/processed/*.parquet
+!data/processed/cells.parquet
+frontend/node_modules/
+data/boundaries/geoBoundaries-ARG-*.geojson
