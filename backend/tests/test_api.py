@@ -62,3 +62,35 @@ def test_exports(client):
     assert r.status_code == 200 and r.text.startswith("sensor,platform,lat,lon")
     r = client.post("/api/export/summary.csv", json=body)
     assert r.status_code == 200 and "unit" in r.text.splitlines()[0]
+
+
+def test_events_and_replay(client):
+    presets = client.get("/api/presets").json()["presets"]
+    g = presets[0]["geometry"]
+    r = client.post("/api/events", json={"aoi": g, "as_of": "2022-02-20"})
+    assert r.status_code == 200
+    j = r.json()
+    assert j["n_events"] > 0 and j["current"] and "since 2012" in j["sentence"]
+    r = client.post("/api/replay", json={"aoi": g, "as_of": "2022-02-20"})
+    assert r.status_code == 200
+    j = r.json()
+    assert j["summary"]["as_of"] == "2022-02-20"
+    assert all(t["date"] <= "2022-02-20" for t in j["replay"]["alert_timeline"])  # nothing after as_of
+    assert j["timeline"]["date"][-1] <= "2022-02-20"
+
+
+def test_methods_and_backtest(client):
+    m = client.get("/api/methods").json()
+    assert set(m["holdout"]) == {"k_M", "k_V"}
+    r = client.get("/api/backtest/corrientes-2022")
+    if r.status_code == 200:
+        b = r.json()
+        assert b["honesty"]["n_seasons"] == 19
+        assert len(b["markers"]) == 4
+
+
+def test_no_data_months_are_null_not_zero(client):
+    j = client.post("/api/query", json={"aoi": {"lat": -28.5, "lon": -57.2, "radius_km": 25}}).json()
+    for c in j["calendar_monthly"]:
+        if c["provenance"] == "no data":
+            assert c["value"] is None
