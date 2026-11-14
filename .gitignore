@@ -10,3 +10,4 @@ data/processed/*.parquet
 !data/processed/cells.parquet
 frontend/node_modules/
 data/boundaries/geoBoundaries-ARG-*.geojson
+deploy/_hf_stage/

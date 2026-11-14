@@ -435,6 +435,16 @@ def detections(body: QueryBody):
             "truncated": truncated, "n": len(feats)}
 
 
+def mount_frontend() -> None:
+    """Serve the built frontend (frontend/dist) from the same server if present: one-command local demo
+    backup, and a single-Space deployment option. API routes are registered first, so they take priority."""
+    from fastapi.staticfiles import StaticFiles
+
+    dist = C.ROOT / "frontend" / "dist"
+    if dist.exists():
+        app.mount("/", StaticFiles(directory=dist, html=True), name="frontend")
+
+
 @app.post("/api/export/summary.csv")
 def export_summary(body: QueryBody):
     res = compute(body)
@@ -448,3 +458,6 @@ def export_summary(body: QueryBody):
     df.insert(2, "month_name", df.month.map(lambda m: MONTHS[m - 1]))
     df["unit"] = "burning cells per month (0.02° cells with ≥1 active-fire detection, summed over days)"
     return _csv_response(df, "emberline_summary.csv")
+
+
+mount_frontend()  # must stay last: after every /api route

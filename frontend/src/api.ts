@@ -1,5 +1,6 @@
 // API client: every call has a timeout and falls back to precomputed JSON for preset AOIs (§8.4).
-export const API = (import.meta.env.VITE_API_URL as string | undefined)?.replace(/\/$/, '') || 'http://127.0.0.1:8000'
+// VITE_API_URL for a separately hosted API (e.g. Vercel → HF Space); otherwise dev → local API, build → same origin
+export const API = (import.meta.env.VITE_API_URL as string | undefined)?.replace(/\/$/, '') ?? (import.meta.env.DEV ? 'http://127.0.0.1:8000' : '')
 const TIMEOUT_MS = 4000          // with a cached fallback available (§8.4)
 const TIMEOUT_NO_FALLBACK_MS = 20000  // custom AOIs have no fallback: wait longer rather than fail
 

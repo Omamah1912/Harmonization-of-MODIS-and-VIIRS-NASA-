@@ -15,7 +15,7 @@ R = C.ALERT_RULE
 def doy365(dates) -> np.ndarray:
     """Day of a 365-day year (Feb 29 shares Feb 28's slot)."""
     d = pd.to_datetime(pd.Series(dates))
-    doy = d.dt.dayofyear.to_numpy()
+    doy = d.dt.day_of_year.to_numpy()
     leap = d.dt.is_leap_year.to_numpy()
     return np.where(leap & (doy > 59), doy - 1, doy)
 

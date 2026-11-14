@@ -9,7 +9,8 @@ RUN pip install --no-cache-dir -r backend/requirements.txt
 COPY --chown=user pipeline/ pipeline/
 COPY --chown=user backend/ backend/
 COPY --chown=user data/processed/ data/processed/
-COPY --chown=user data/boundaries/corrientes_adm1.geojson data/boundaries/corrientes_adm2.geojson data/boundaries/
+COPY --chown=user data/boundaries/ data/boundaries/
+COPY --chown=user frontend/ frontend/
 USER user
 EXPOSE 7860
 CMD ["sh", "-c", "uvicorn backend.app.main:app --host 0.0.0.0 --port ${PORT}"]

@@ -1,0 +1,11 @@
+.env
+.venv/
+.git/
+data/raw/
+data/boundaries/geoBoundaries-*
+frontend/node_modules/
+frontend/src/
+frontend/public/
+deploy/
+**/__pycache__/
+**/tests/

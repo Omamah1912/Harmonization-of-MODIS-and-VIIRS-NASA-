@@ -43,6 +43,7 @@ export default function App() {
   const [ev, setEv] = useState<EventsResult | null>(null)
   const [det, setDet] = useState<Detections | null>(null)
   const [detLabel, setDetLabel] = useState('last 7 days')
+  const [focus, setFocus] = useState<[string, string] | null>(null)
   const [cached, setCached] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
@@ -112,6 +113,7 @@ export default function App() {
     const s = `${y}-${String(m).padStart(2, '0')}-01`
     const e = new Date(Date.UTC(y, m, 0)).toISOString().slice(0, 10)
     loadDetections(s, e, `${MONTHS[m - 1]} ${y}`)
+    setFocus([addDays(s, -45), addDays(e, 45)])
   }
 
   // ------------------------------------------------------------ replay (§7.1, §7.4)
@@ -240,7 +242,7 @@ export default function App() {
           <div className="status-line">
             {loading && <span className="badge">loading…</span>}
             {cached && <span className="badge cached">cached — precomputed result, live API unavailable</span>}
-            {replayMode && <span className="badge replay">REPLAY · as of {asOf}</span>}
+            {replayMode && <span className="badge replay">REPLAY · as of {q?.summary.as_of ?? asOf}</span>}
             {q && <span className="muted">{aoiName} · {fmt(q.summary.area_km2)} km² · {q.summary.cells_in_aoi} cells{q.summary.clipped_fraction > 0 ? ` · ${(q.summary.clipped_fraction * 100).toFixed(0)}% outside coverage was clipped` : ''} · data to {q.summary.last_observed_day}</span>}
           </div>
           {error && <div className="error">{error}</div>}
@@ -316,6 +318,11 @@ export default function App() {
                 <p>{q.peaks.sentence}</p>
                 <Calendar cells={q.calendar_monthly} raw={raw} onPick={pickMonth} windows={q.critical_windows.windows} />
                 <div className="row"><button onClick={() => exportPng(calRef.current, 'emberline_calendar.png')}>Calendar PNG</button></div>
+              </div>
+              <div className="panel wide">
+                <h2>Daily timeline {focus ? `(zoomed to the selected month)` : ''}</h2>
+                <Timeline q={q} focus={focus ?? [addDays(q.summary.as_of, -730), q.summary.as_of]} markers={methods?.markers} height={240} />
+                <p className="note">Click a calendar cell to jump here and show that month's detections on the map. Green band = 90% interval on estimated days.</p>
               </div>
               <div className="panel">
                 <h2>Seasonal climatology</h2>

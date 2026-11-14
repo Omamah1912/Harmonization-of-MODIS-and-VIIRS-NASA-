@@ -118,7 +118,7 @@ export function Calendar({ cells, raw, onPick, windows }: { cells: CalCell[]; ra
 }
 
 // ---------------------------------------------------------------- timeline (H, S, thresholds, markers, windows)
-export function Timeline({ q, markers, asOf, alertDates, height = 260 }: { q: QueryResult; markers?: Marker[]; asOf?: string; alertDates?: { alert?: string | null; severe?: string | null }; height?: number }) {
+export function Timeline({ q, markers, asOf, alertDates, height = 260, focus }: { q: QueryResult; markers?: Marker[]; asOf?: string; alertDates?: { alert?: string | null; severe?: string | null }; height?: number; focus?: [string, string] | null }) {
   const t = q.timeline
   const est = t.date.map((d, i) => (t.provenance[i] === 'estimated' ? [d, t.H_low[i], t.H_high[i]] : [d, null, null]))
   const mk: any[] = (markers || []).filter(m => m.date >= t.date[0] && m.date <= t.date[t.date.length - 1]).map(m => ({
@@ -135,10 +135,12 @@ export function Timeline({ q, markers, asOf, alertDates, height = 260 }: { q: Qu
     tooltip: { trigger: 'axis', valueFormatter: (v: number) => fmt(v, 1) },
     xAxis: { type: 'category', data: t.date },
     yAxis: [{ type: 'value', name: 'cells/day' }, { type: 'value', name: '7-day sum', splitLine: { show: false } }],
-    dataZoom: [{ type: 'inside' }, { type: 'slider', height: 16, bottom: 8 }],
+    dataZoom: focus ? [{ type: 'inside', startValue: focus[0], endValue: focus[1] }, { type: 'slider', height: 16, bottom: 8, startValue: focus[0], endValue: focus[1] }]
+      : [{ type: 'inside' }, { type: 'slider', height: 16, bottom: 8 }],
     series: [
       { name: 'H (burning cells/day)', type: 'bar', data: t.H, itemStyle: { color: '#31688e' }, barCategoryGap: 0, markLine: { symbol: 'none', data: mk } },
-      { name: 'estimated band', type: 'line', data: est.map(e => e[2]), lineStyle: { opacity: 0 }, symbol: 'none', areaStyle: { color: 'rgba(53,183,121,0.25)' }, silent: true },
+      { name: 'band-low', type: 'line', stack: 'ci', data: est.map(e => e[1]), lineStyle: { opacity: 0 }, symbol: 'none', silent: true, tooltip: { show: false } },
+      { name: '90% interval (estimated days)', type: 'line', stack: 'ci', data: est.map(e => (e[1] == null || e[2] == null ? null : (e[2] as number) - (e[1] as number))), lineStyle: { opacity: 0 }, symbol: 'none', areaStyle: { color: 'rgba(53,183,121,0.35)' }, silent: true, tooltip: { show: false } },
       { name: '7-day sum S', type: 'line', yAxisIndex: 1, data: t.S, symbol: 'none', lineStyle: { color: '#1f9e89', width: 2 } },
       { name: 'P90', type: 'line', yAxisIndex: 1, data: t.P90, symbol: 'none', lineStyle: { color: '#e08214', type: 'dashed' } },
       { name: 'P99', type: 'line', yAxisIndex: 1, data: t.P99, symbol: 'none', lineStyle: { color: '#7f3b08', type: 'dashed' } },
