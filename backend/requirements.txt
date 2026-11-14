@@ -1,0 +1,11 @@
+fastapi
+uvicorn[standard]
+pandas
+pyarrow
+duckdb
+numpy
+shapely
+geopandas
+scipy
+python-dotenv
+httpx

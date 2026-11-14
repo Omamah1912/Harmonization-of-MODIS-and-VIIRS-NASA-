@@ -77,12 +77,16 @@ def build_cells(region_geom, cell_deg=C.CELL_DEG) -> pd.DataFrame:
 
 
 # ------------------------------------------------------------------ coverage
-def fetched_days(source: str, src_max: date | None) -> set[date]:
-    """Dates for which a chunk of `source` exists on disk (a header-only chunk still counts)."""
-    d = C.RAW / source
-    if not d.exists():
-        return set()
-    starts = sorted(date.fromisoformat(p.stem) for p in d.glob("*.csv"))
+def fetched_days(source: str, src_max: date | None, manifest: dict | None = None) -> set[date]:
+    """Dates covered by an INGESTED chunk of `source` (a header-only chunk still counts).
+    Uses the normalizer's manifest so coverage and detections come from the same snapshot."""
+    if manifest is not None:
+        starts = sorted(date.fromisoformat(s) for s in manifest.get(source, []))
+    else:
+        d = C.RAW / source
+        if not d.exists():
+            return set()
+        starts = sorted(date.fromisoformat(p.stem) for p in d.glob("*.csv"))
     out = set()
     for i, s in enumerate(starts):
         end = s + timedelta(days=C.DAY_RANGE - 1)
@@ -227,7 +231,8 @@ def main() -> None:
     avail = pd.read_csv(C.RAW / "data_availability.csv")
     missing = pd.read_csv(C.RAW / "missing_days.csv")
     a = avail.set_index("data_id")
-    fetched = {s: fetched_days(s, pd.Timestamp(a.loc[s, "max_date"]).date() if s in a.index else None)
+    manifest = json.loads((C.PROCESSED / "ingested_chunks.json").read_text())
+    fetched = {s: fetched_days(s, pd.Timestamp(a.loc[s, "max_date"]).date() if s in a.index else None, manifest)
                for srcs in PLATFORM_SOURCES.values() for s in srcs}
     cov = build_coverage(avail, missing, fetched)
 

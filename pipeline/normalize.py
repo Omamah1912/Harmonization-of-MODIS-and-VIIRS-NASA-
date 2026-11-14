@@ -101,10 +101,17 @@ def clip(df: pd.DataFrame, geom) -> pd.DataFrame:
     return df[inside]
 
 
-def read_raw_dir(raw_dir: Path) -> list[pd.DataFrame]:
+MANIFEST = "ingested_chunks.json"
+
+
+def read_raw_dir(raw_dir: Path, manifest: dict | None = None) -> list[pd.DataFrame]:
+    """Reads every cached chunk. Records which chunk files were ingested so the coverage mask is built
+    from exactly the same snapshot (a chunk downloaded later must not count as observed-with-zero)."""
     frames = []
     for src_dir in sorted(p for p in raw_dir.iterdir() if p.is_dir()):
         files = sorted(src_dir.glob("*.csv"))
+        if manifest is not None:
+            manifest[src_dir.name] = [f.stem for f in files]
         parts = [pd.read_csv(f, dtype={"confidence": str, "acq_time": str}) for f in files if f.stat().st_size]
         parts = [p for p in parts if not p.empty]
         if parts:
@@ -114,7 +121,8 @@ def read_raw_dir(raw_dir: Path) -> list[pd.DataFrame]:
 
 
 def main() -> pd.DataFrame:
-    frames = read_raw_dir(C.RAW)
+    manifest: dict = {}
+    frames = read_raw_dir(C.RAW, manifest)
     if not frames:
         raise SystemExit("no raw data yet")
     df = pd.concat(frames, ignore_index=True)
@@ -125,6 +133,9 @@ def main() -> pd.DataFrame:
     df = df.sort_values(["acq_utc", "platform"]).reset_index(drop=True)
     C.PROCESSED.mkdir(parents=True, exist_ok=True)
     df.to_parquet(C.PROCESSED / "detections.parquet", index=False)
+    import json
+
+    (C.PROCESSED / MANIFEST).write_text(json.dumps(manifest))
     print(f"detections: raw {n0}, after dedup {n1}, after clip {len(df)}")
     print(df.groupby(["sensor", "platform", "processing"]).size().to_string())
     return df
