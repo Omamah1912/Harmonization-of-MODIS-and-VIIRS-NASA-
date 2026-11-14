@@ -56,6 +56,29 @@ class DayBudget:
             time.sleep(min(max(wait, 1), 30))
 
 
+class ServerGate:
+    """Second safety net: FIRMS's own transaction counter (mapkey_status). FIRMS charges ~2 transactions
+    per requested day, so the local budget alone is not trusted. Blocks while usage is near the limit."""
+
+    def __init__(self, key: str, ceiling: int, poll_s: int = 15):
+        self.key, self.ceiling, self.poll_s = key, ceiling, poll_s
+        self.lock = threading.Lock()
+        self.last_t, self.last_used = 0.0, 0
+
+    def wait(self) -> None:
+        while True:
+            with self.lock:
+                if time.time() - self.last_t > self.poll_s:
+                    try:
+                        self.last_used = int(key_status(self.key).get("current_transactions", 0))
+                    except Exception:
+                        pass
+                    self.last_t = time.time()
+                if self.last_used < self.ceiling:
+                    return
+            time.sleep(20)
+
+
 # ---------------------------------------------------------------- API helpers
 def key_status(key: str) -> dict:
     r = SESSION.get(f"{C.FIRMS_BASE}/mapserver/mapkey_status/", params={"MAP_KEY": key}, timeout=30)
@@ -122,6 +145,9 @@ def log_failure(source: str, start: date, n: int, err: str) -> None:
             w.writerow([datetime.utcnow().isoformat(timespec="seconds"), source, start, n, err[:300]])
 
 
+GATE: ServerGate | None = None
+
+
 def fetch_chunk(key: str, budget: DayBudget, source: str, start: date, n: int) -> str:
     path = chunk_path(source, start)
     if path.exists():
@@ -130,8 +156,11 @@ def fetch_chunk(key: str, budget: DayBudget, source: str, start: date, n: int) -
     url = f"{C.FIRMS_BASE}/api/area/csv/{key}/{source}/{bbox}/{n}/{start.isoformat()}"
     delay = 5
     last = ""
-    for attempt in range(5):
-        budget.acquire(n)
+    attempt = 0
+    while attempt < 5:
+        budget.acquire(n * C.TRANSACTIONS_PER_DAY)
+        if GATE:
+            GATE.wait()
         try:
             r = SESSION.get(url, timeout=120)
             text = r.text
@@ -140,8 +169,8 @@ def fetch_chunk(key: str, budget: DayBudget, source: str, start: date, n: int) -
             if r.status_code != 200 or not text.lstrip().lower().startswith("latitude"):
                 # FIRMS reports some errors as 200 + plain text (e.g. bad key, invalid range)
                 last = f"HTTP {r.status_code}: {text.strip()[:200]}"
-                if "exceeding" in text.lower() or "limit" in text.lower():
-                    time.sleep(60)
+                if "exceed" in text.lower() or "limit" in text.lower():
+                    time.sleep(60)  # rate limited: wait, does not count as an attempt
                     continue
                 log_failure(source, start, n, redact(last, key))
                 return "rejected"
@@ -151,6 +180,7 @@ def fetch_chunk(key: str, budget: DayBudget, source: str, start: date, n: int) -
             tmp.replace(path)
             return "ok"
         except (requests.RequestException, OSError) as e:
+            attempt += 1
             last = redact(str(e), key)
             time.sleep(delay)
             delay *= 2
@@ -180,7 +210,7 @@ def main() -> None:
     avail = availability(key)
     ranges = plan_ranges(avail)
     for s, lo, hi in ranges:
-        print(f"  {s:20s} {lo} → {hi}  ({(hi - lo).days + 1} days)")
+        print(f"  {s:20s} {lo} -> {hi}  ({(hi - lo).days + 1} days)")
     if args.only:
         ranges = [r for r in ranges if r[0] in args.only]
     if args.start or args.end:
@@ -194,7 +224,9 @@ def main() -> None:
     if args.plan or not todo:
         return
 
-    budget = DayBudget(C.MAX_DAYS_PER_10MIN)
+    global GATE
+    budget = DayBudget(C.MAX_TRANSACTIONS_PER_10MIN)
+    GATE = ServerGate(key, C.SERVER_TX_CEILING)
     counts: dict[str, int] = {}
     rejected = []
     t0 = time.time()

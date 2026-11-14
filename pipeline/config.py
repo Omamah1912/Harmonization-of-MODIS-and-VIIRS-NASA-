@@ -34,7 +34,11 @@ COVERAGE_BUFFER_DEG = 0.05  # small buffer when clipping detections to the provi
 # §4.2 FIRMS
 FIRMS_BASE = "https://firms.modaps.eosdis.nasa.gov"
 DAY_RANGE = 5
-MAX_DAYS_PER_10MIN = 4000  # FIRMS limit is 5000 transactions / 10 min; stay below
+# FIRMS limit is 5000 transactions / 10 min. Observed: FIRMS charges ~2 transactions per requested day
+# (506 five-day requests -> 4992 transactions), so budget in transactions, not days.
+TRANSACTIONS_PER_DAY = 2
+MAX_TRANSACTIONS_PER_10MIN = 4000
+SERVER_TX_CEILING = 4300  # pause while FIRMS reports usage above this
 FETCH_WORKERS = 4
 
 # Sources by group. Priority within VIIRS: SNPP > NOAA20 > NOAA21 (§5.2)
@@ -42,7 +46,7 @@ SOURCES = {
     "MODIS": ("MODIS_SP", "MODIS_NRT"),
     "VIIRS_SNPP": ("VIIRS_SNPP_SP", "VIIRS_SNPP_NRT"),
     "VIIRS_NOAA20": ("VIIRS_NOAA20_SP", "VIIRS_NOAA20_NRT"),
-    "VIIRS_NOAA21": (None, "VIIRS_NOAA21_NRT"),
+    "VIIRS_NOAA21": ("VIIRS_NOAA21_SP", "VIIRS_NOAA21_NRT"),
 }
 VIIRS_PRIORITY = ["SNPP", "NOAA20", "NOAA21"]
 
@@ -54,6 +58,7 @@ SHRINK_N0 = 200
 BOOTSTRAP_DRAWS = 500
 BOOTSTRAP_SEED = 20261115
 INTER_VIIRS_TOLERANCE = 0.10
+INTER_VIIRS_MIN_CELLS = 200  # a month decides the inter-VIIRS check only with >= 200 cells
 
 # §6.1
 INCOMPLETE_COVERAGE = 0.80

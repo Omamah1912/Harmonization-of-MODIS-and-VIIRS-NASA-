@@ -10,3 +10,4 @@ uvicorn
 pytest
 httpx
 python-dotenv
+scipy
