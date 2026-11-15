@@ -135,7 +135,7 @@ def main() -> pd.DataFrame:
     df.to_parquet(C.PROCESSED / "detections.parquet", index=False)
     import json
 
-    (C.PROCESSED / MANIFEST).write_text(json.dumps(manifest))
+    (C.PROCESSED / MANIFEST).write_text(json.dumps(manifest), encoding="utf-8")
     print(f"detections: raw {n0}, after dedup {n1}, after clip {len(df)}")
     print(df.groupby(["sensor", "platform", "processing"]).size().to_string())
     return df

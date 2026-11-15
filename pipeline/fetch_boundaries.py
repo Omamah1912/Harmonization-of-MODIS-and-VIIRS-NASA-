@@ -15,7 +15,7 @@ def download(lvl: str) -> gpd.GeoDataFrame:
     raw = C.BOUNDARIES / f"geoBoundaries-ARG-{lvl}.geojson"
     if not raw.exists():
         meta = requests.get(API.format(lvl=lvl), timeout=60).json()
-        (C.BOUNDARIES / f"geoBoundaries-ARG-{lvl}.meta.json").write_text(json.dumps(meta, indent=2))
+        (C.BOUNDARIES / f"geoBoundaries-ARG-{lvl}.meta.json").write_text(json.dumps(meta, indent=2), encoding="utf-8")
         r = requests.get(meta["gjDownloadURL"], timeout=300)
         r.raise_for_status()
         raw.write_bytes(r.content)

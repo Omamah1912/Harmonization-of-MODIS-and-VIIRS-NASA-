@@ -58,8 +58,8 @@ class Store:
         P = C.PROCESSED
         self.cells = pd.read_parquet(P / "cells.parquet")
         self.cov = pd.read_parquet(P / "coverage.parquet")
-        self.cal = json.loads((P / "calibration.json").read_text())
-        self.iv = json.loads((P / "inter_viirs.json").read_text())
+        self.cal = json.loads((P / "calibration.json").read_text(encoding="utf-8"))
+        self.iv = json.loads((P / "inter_viirs.json").read_text(encoding="utf-8"))
         self.cell_index = pd.Index(self.cells["cell_id"])
         self.members = self._with_cidx(pd.read_parquet(P / "event_cells.parquet"))
         self.events = pd.read_parquet(P / "events.parquet").set_index("event_id", drop=False)

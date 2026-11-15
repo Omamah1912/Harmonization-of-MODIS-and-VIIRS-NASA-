@@ -15,7 +15,7 @@ def province_daily_h() -> pd.DataFrame:
     cells = pd.read_parquet(C.PROCESSED / "cells.parquet")
     cov = pd.read_parquet(C.PROCESSED / "coverage.parquet")
     cd = pd.read_parquet(C.PROCESSED / "cell_day.parquet")
-    cal = json.loads((C.PROCESSED / "calibration.json").read_text())
+    cal = json.loads((C.PROCESSED / "calibration.json").read_text(encoding="utf-8"))
     ik = lambda d: {int(k): v for k, v in d.items()}  # noqa: E731
     region = set(cells.loc[cells.in_region, "cell_id"])
     daily = daily_components(cd[cd.cell_id.isin(region)], cov)
@@ -28,17 +28,34 @@ def lead_lag(first: str | None, marker_date: str) -> int | None:
     return (date.fromisoformat(marker_date) - date.fromisoformat(first)).days
 
 
+def episode_onset(ev: pd.DataFrame, s0: str, s1: str, first_severe: str | None) -> str | None:
+    """Reporting only (the rule is unchanged): the first day of the unbroken non-Normal run that contains the
+    first Severe day. Separates the alert episode that led into the event from short earlier blips that cleared."""
+    if not first_severe:
+        return None
+    w = ev[(ev.solar_date >= date.fromisoformat(s0)) & (ev.solar_date <= date.fromisoformat(first_severe))]
+    onset = None
+    for r in w.itertuples():
+        if r.status in ("Elevated", "Extreme"):
+            onset = onset or str(r.solar_date)
+        else:
+            onset = None
+    return onset
+
+
 def run(dh: pd.DataFrame) -> dict:
     sig = signal(dh)
     thr = thresholds(sig)
     ev = evaluate(sig, thr)
     s0, s1 = C.BACKTEST_SEASON
     target = first_dates(ev, s0, s1)
+    target["episode_onset"] = episode_onset(ev, s0, s1, target["first_severe"])
     markers = []
     for m in C.OFFICIAL_MARKERS:
         markers.append({**m,
                         "days_after_first_alert": lead_lag(target["first_alert"], m["date"]),
-                        "days_after_first_severe": lead_lag(target["first_severe"], m["date"])})
+                        "days_after_first_severe": lead_lag(target["first_severe"], m["date"]),
+                        "days_after_episode_onset": lead_lag(target["episode_onset"], m["date"])})
     honesty = []
     for y in range(C.ALERT_RULE["baseline_years"][0], C.ALERT_RULE["baseline_years"][1] + 1):
         r = first_dates(ev, f"{y - 1}-11-01", f"{y}-03-31")
@@ -79,12 +96,14 @@ def methods_block(bt: dict) -> str:
          f"Season {bt['season']['start']} → {bt['season']['end']}, {bt['aoi']}.", "",
          f"- First Alert (S > P90, 3 days): **{r['first_alert'] or 'none'}**",
          f"- First Severe (S > P99, 3 days): **{r['first_severe'] or 'none'}**",
+         f"- Onset of the unbroken alert episode containing the first Severe: **{r.get('episode_onset') or 'none'}** "
+         "(reporting aid only; earlier alert days that returned to Normal are short blips, listed in the timeline)",
          f"- Alert days in season: {r['alert_days']}, Severe days: {r['severe_days']}, no-data days: {r['no_data_days']}",
-         "", "| Official marker | Date | Verified | Days after first Alert | Days after first Severe |",
-         "|---|---|---|---|---|"]
+         "", "| Official marker | Date | Verified | Days after first Alert | Days after episode onset | Days after first Severe |",
+         "|---|---|---|---|---|---|"]
     for m in bt["markers"]:
         L.append(f"| {m['label']} | {m['date']} | {'yes' if m['verified'] else 'no'} | "
-                 f"{m['days_after_first_alert']} | {m['days_after_first_severe']} |")
+                 f"{m['days_after_first_alert']} | {m['days_after_episode_onset']} | {m['days_after_first_severe']} |")
     h = bt["honesty"]
     L += ["", f"**Honesty check:** {h['sentence']} {h['note']}", "",
           "| Season | Alert | First alert | Severe | First severe |", "|---|---|---|---|---|"]
@@ -97,7 +116,7 @@ def methods_block(bt: dict) -> str:
 
 def main() -> dict:
     bt = run(province_daily_h())
-    (C.PROCESSED / "backtest_corrientes_2022.json").write_text(json.dumps(bt, indent=2, ensure_ascii=False))
+    (C.PROCESSED / "backtest_corrientes_2022.json").write_text(json.dumps(bt, indent=2, ensure_ascii=False), encoding="utf-8")
     from pipeline.methods_doc import update_block
 
     update_block("BACKTEST", methods_block(bt))

@@ -165,8 +165,8 @@ def main() -> dict:
         msv = monthly_sums(dv, "B")
         fv = factors(msv, years_M, years, draws=200)
         cal["variants"][v] = {k: fv[k] for k in ["k_M", "k_V", "k_M_ci", "k_V_ci"]}
-    (C.PROCESSED / "calibration.json").write_text(json.dumps(cal, indent=2, default=float))
-    iv = json.loads((C.PROCESSED / "inter_viirs.json").read_text())
+    (C.PROCESSED / "calibration.json").write_text(json.dumps(cal, indent=2, default=float), encoding="utf-8")
+    iv = json.loads((C.PROCESSED / "inter_viirs.json").read_text(encoding="utf-8"))
     write_methods(cal, iv)
     print("overlap years:", years, "| drift:", stab["drift_flag"])
     print("k_M:", {m: round(v, 3) for m, v in f["k_M"].items()})

@@ -231,7 +231,7 @@ def main() -> None:
     avail = pd.read_csv(C.RAW / "data_availability.csv")
     missing = pd.read_csv(C.RAW / "missing_days.csv")
     a = avail.set_index("data_id")
-    manifest = json.loads((C.PROCESSED / "ingested_chunks.json").read_text())
+    manifest = json.loads((C.PROCESSED / "ingested_chunks.json").read_text(encoding="utf-8"))
     fetched = {s: fetched_days(s, pd.Timestamp(a.loc[s, "max_date"]).date() if s in a.index else None, manifest)
                for srcs in PLATFORM_SOURCES.values() for s in srcs}
     cov = build_coverage(avail, missing, fetched)
@@ -248,7 +248,7 @@ def main() -> None:
             print(f"default cell_day rows: {len(cd)}")
     cov = viirs_scale(cov, iv)
     cov.to_parquet(C.PROCESSED / "coverage.parquet", index=False)
-    (C.PROCESSED / "inter_viirs.json").write_text(json.dumps(iv, indent=2))
+    (C.PROCESSED / "inter_viirs.json").write_text(json.dumps(iv, indent=2), encoding="utf-8")
     print("coverage eras:", cov["era"].value_counts().to_dict())
     print("VIIRS reference:", cov["viirs_ref"].value_counts(dropna=False).to_dict())
     for k, v in iv.items():

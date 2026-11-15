@@ -39,7 +39,7 @@ def main() -> pd.DataFrame:
     r = requests.get(URL, headers={"X-Requested-With": "XMLHttpRequest"}, timeout=60)
     r.raise_for_status()
     d = r.json()
-    (C.RAW / "missing_data_raw.json").write_text(json.dumps(d))
+    (C.RAW / "missing_data_raw.json").write_text(json.dumps(d), encoding="utf-8")
     df = parse(d["html"]).sort_values(["platform", "date"])
     df.to_csv(C.RAW / "missing_days.csv", index=False)
     print(df.groupby(["platform", "processing"]).size().to_string())

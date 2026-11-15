@@ -1,0 +1,1862 @@
+{
+  "rule": {
+    "signal": "7-day rolling sum of harmonized burning cells H_d in the AOI",
+    "window_days": 7,
+    "baseline_years": [
+      2003,
+      2021
+    ],
+    "doy_pool_halfwidth": 15,
+    "alert_percentile": 90,
+    "severe_percentile": 99,
+    "consecutive_days": 3
+  },
+  "aoi": "Corrientes province (geoBoundaries ADM1)",
+  "season": {
+    "start": "2021-11-01",
+    "end": "2022-03-31"
+  },
+  "result": {
+    "first_alert": "2021-11-01",
+    "first_severe": "2021-12-31",
+    "alert_days": 66,
+    "severe_days": 48,
+    "no_data_days": 0,
+    "peak_S": 2702.0,
+    "peak_S_date": "2022-02-19",
+    "episode_onset": "2021-12-28"
+  },
+  "markers": [
+    {
+      "date": "2022-01-01",
+      "label": "National emergencia ígnea, Decree 6/2022 (exact date to verify)",
+      "source_url": "https://www.argentina.gob.ar/sites/default/files/2022/12/2_de_diciembre_-_reporte.pdf",
+      "verified": false,
+      "days_after_first_alert": 61,
+      "days_after_first_severe": 1,
+      "days_after_episode_onset": 4
+    },
+    {
+      "date": "2022-02-01",
+      "label": "Corrientes emergencia ígnea, Decree 167/2022 (press date)",
+      "source_url": "https://aldiaargentina.microjuris.com/2022/02/24/legislacion-incendios-se-declara-a-la-provincia-de-corrientes-zona-de-desastre-ecologico-y-ambiental-debido-a-los-estragos-ocasionados-en-la-fauna-la-flora-y-la-biodiversidad/",
+      "verified": false,
+      "days_after_first_alert": 92,
+      "days_after_first_severe": 32,
+      "days_after_episode_onset": 35
+    },
+    {
+      "date": "2022-02-07",
+      "label": "Corrientes agricultural emergency/disaster, Decree 200/2022 (signed; B.O. 9 Feb)",
+      "source_url": "https://aldiaargentina.microjuris.com/2022/02/11/legislacion-incendios-rurales-corrientes-declara-el-estado-de-emergencia-y-o-desastre-agropecuario-por-6-meses/",
+      "verified": true,
+      "days_after_first_alert": 98,
+      "days_after_first_severe": 38,
+      "days_after_episode_onset": 41
+    },
+    {
+      "date": "2022-02-22",
+      "label": "Corrientes ecological & environmental disaster zone, DNU 335/2022 (B.O.)",
+      "source_url": "https://aldiaargentina.microjuris.com/2022/02/24/legislacion-incendios-se-declara-a-la-provincia-de-corrientes-zona-de-desastre-ecologico-y-ambiental-debido-a-los-estragos-ocasionados-en-la-fauna-la-flora-y-la-biodiversidad/",
+      "verified": false,
+      "days_after_first_alert": 113,
+      "days_after_first_severe": 53,
+      "days_after_episode_onset": 56
+    }
+  ],
+  "honesty": {
+    "seasons": [
+      {
+        "season": "2002-11 → 2003-03",
+        "alert": false,
+        "severe": false,
+        "first_alert": null,
+        "first_severe": null,
+        "alert_days": 0,
+        "severe_days": 0,
+        "no_data_days": 0,
+        "peak_S": 317.73575655368734,
+        "peak_S_date": "2003-02-04",
+        "calendar_year_alert_days": 33,
+        "calendar_year_severe_days": 3
+      },
+      {
+        "season": "2003-11 → 2004-03",
+        "alert": true,
+        "severe": true,
+        "first_alert": "2004-02-01",
+        "first_severe": "2004-03-28",
+        "alert_days": 22,
+        "severe_days": 4,
+        "no_data_days": 0,
+        "peak_S": 1879.3563218390805,
+        "peak_S_date": "2004-03-28",
+        "calendar_year_alert_days": 36,
+        "calendar_year_severe_days": 8
+      },
+      {
+        "season": "2004-11 → 2005-03",
+        "alert": true,
+        "severe": true,
+        "first_alert": "2005-01-28",
+        "first_severe": "2005-03-07",
+        "alert_days": 22,
+        "severe_days": 4,
+        "no_data_days": 0,
+        "peak_S": 2730.939655172414,
+        "peak_S_date": "2005-03-08",
+        "calendar_year_alert_days": 22,
+        "calendar_year_severe_days": 4
+      },
+      {
+        "season": "2005-11 → 2006-03",
+        "alert": true,
+        "severe": false,
+        "first_alert": "2006-01-12",
+        "first_severe": null,
+        "alert_days": 27,
+        "severe_days": 0,
+        "no_data_days": 0,
+        "peak_S": 949.5174032068829,
+        "peak_S_date": "2006-02-15",
+        "calendar_year_alert_days": 38,
+        "calendar_year_severe_days": 0
+      },
+      {
+        "season": "2006-11 → 2007-03",
+        "alert": false,
+        "severe": false,
+        "first_alert": null,
+        "first_severe": null,
+        "alert_days": 0,
+        "severe_days": 0,
+        "no_data_days": 0,
+        "peak_S": 285.3010037804718,
+        "peak_S_date": "2007-02-16",
+        "calendar_year_alert_days": 21,
+        "calendar_year_severe_days": 0
+      },
+      {
+        "season": "2007-11 → 2008-03",
+        "alert": true,
+        "severe": false,
+        "first_alert": "2007-12-22",
+        "first_severe": null,
+        "alert_days": 20,
+        "severe_days": 0,
+        "no_data_days": 0,
+        "peak_S": 1147.9022988505749,
+        "peak_S_date": "2008-03-19",
+        "calendar_year_alert_days": 53,
+        "calendar_year_severe_days": 4
+      },
+      {
+        "season": "2008-11 → 2009-03",
+        "alert": true,
+        "severe": false,
+        "first_alert": "2008-12-20",
+        "first_severe": null,
+        "alert_days": 20,
+        "severe_days": 0,
+        "no_data_days": 0,
+        "peak_S": 744.8017241379309,
+        "peak_S_date": "2009-03-31",
+        "calendar_year_alert_days": 43,
+        "calendar_year_severe_days": 3
+      },
+      {
+        "season": "2009-11 → 2010-03",
+        "alert": false,
+        "severe": false,
+        "first_alert": null,
+        "first_severe": null,
+        "alert_days": 0,
+        "severe_days": 0,
+        "no_data_days": 0,
+        "peak_S": 266.95402298850564,
+        "peak_S_date": "2010-03-17",
+        "calendar_year_alert_days": 31,
+        "calendar_year_severe_days": 0
+      },
+      {
+        "season": "2010-11 → 2011-03",
+        "alert": true,
+        "severe": false,
+        "first_alert": "2010-11-01",
+        "first_severe": null,
+        "alert_days": 30,
+        "severe_days": 0,
+        "no_data_days": 0,
+        "peak_S": 662.0459770114942,
+        "peak_S_date": "2011-03-16",
+        "calendar_year_alert_days": 15,
+        "calendar_year_severe_days": 0
+      },
+      {
+        "season": "2011-11 → 2012-03",
+        "alert": true,
+        "severe": false,
+        "first_alert": "2011-12-21",
+        "first_severe": null,
+        "alert_days": 13,
+        "severe_days": 0,
+        "no_data_days": 0,
+        "peak_S": 900.0,
+        "peak_S_date": "2012-02-19",
+        "calendar_year_alert_days": 16,
+        "calendar_year_severe_days": 0
+      },
+      {
+        "season": "2012-11 → 2013-03",
+        "alert": false,
+        "severe": false,
+        "first_alert": null,
+        "first_severe": null,
+        "alert_days": 0,
+        "severe_days": 0,
+        "no_data_days": 0,
+        "peak_S": 187.0,
+        "peak_S_date": "2013-02-09",
+        "calendar_year_alert_days": 3,
+        "calendar_year_severe_days": 0
+      },
+      {
+        "season": "2013-11 → 2014-03",
+        "alert": true,
+        "severe": false,
+        "first_alert": "2014-02-08",
+        "first_severe": null,
+        "alert_days": 6,
+        "severe_days": 0,
+        "no_data_days": 0,
+        "peak_S": 951.0,
+        "peak_S_date": "2014-02-11",
+        "calendar_year_alert_days": 6,
+        "calendar_year_severe_days": 0
+      },
+      {
+        "season": "2014-11 → 2015-03",
+        "alert": false,
+        "severe": false,
+        "first_alert": null,
+        "first_severe": null,
+        "alert_days": 0,
+        "severe_days": 0,
+        "no_data_days": 0,
+        "peak_S": 233.0,
+        "peak_S_date": "2015-03-23",
+        "calendar_year_alert_days": 2,
+        "calendar_year_severe_days": 0
+      },
+      {
+        "season": "2015-11 → 2016-03",
+        "alert": false,
+        "severe": false,
+        "first_alert": null,
+        "first_severe": null,
+        "alert_days": 0,
+        "severe_days": 0,
+        "no_data_days": 0,
+        "peak_S": 173.0,
+        "peak_S_date": "2016-03-18",
+        "calendar_year_alert_days": 0,
+        "calendar_year_severe_days": 0
+      },
+      {
+        "season": "2016-11 → 2017-03",
+        "alert": false,
+        "severe": false,
+        "first_alert": null,
+        "first_severe": null,
+        "alert_days": 0,
+        "severe_days": 0,
+        "no_data_days": 0,
+        "peak_S": 142.0,
+        "peak_S_date": "2017-03-31",
+        "calendar_year_alert_days": 23,
+        "calendar_year_severe_days": 0
+      },
+      {
+        "season": "2017-11 → 2018-03",
+        "alert": true,
+        "severe": false,
+        "first_alert": "2017-11-25",
+        "first_severe": null,
+        "alert_days": 27,
+        "severe_days": 0,
+        "no_data_days": 0,
+        "peak_S": 501.0,
+        "peak_S_date": "2018-01-09",
+        "calendar_year_alert_days": 9,
+        "calendar_year_severe_days": 0
+      },
+      {
+        "season": "2018-11 → 2019-03",
+        "alert": false,
+        "severe": false,
+        "first_alert": null,
+        "first_severe": null,
+        "alert_days": 0,
+        "severe_days": 0,
+        "no_data_days": 0,
+        "peak_S": 330.0,
+        "peak_S_date": "2019-03-28",
+        "calendar_year_alert_days": 8,
+        "calendar_year_severe_days": 0
+      },
+      {
+        "season": "2019-11 → 2020-03",
+        "alert": false,
+        "severe": false,
+        "first_alert": null,
+        "first_severe": null,
+        "alert_days": 0,
+        "severe_days": 0,
+        "no_data_days": 0,
+        "peak_S": 555.0,
+        "peak_S_date": "2020-03-14",
+        "calendar_year_alert_days": 78,
+        "calendar_year_severe_days": 8
+      },
+      {
+        "season": "2020-11 → 2021-03",
+        "alert": true,
+        "severe": true,
+        "first_alert": "2020-11-01",
+        "first_severe": "2020-11-07",
+        "alert_days": 24,
+        "severe_days": 6,
+        "no_data_days": 0,
+        "peak_S": 848.0,
+        "peak_S_date": "2020-11-25",
+        "calendar_year_alert_days": 15,
+        "calendar_year_severe_days": 1
+      }
+    ],
+    "n_seasons": 19,
+    "n_alert": 10,
+    "n_severe": 3,
+    "sentence": "This rule fired in 10 of 19 seasons (Nov–Mar, 2003–2021); Severe in 3.",
+    "note": "The 2003–2021 seasons are part of the baseline, so this is an in-sample false-alarm rate."
+  },
+  "timeline": [
+    {
+      "date": "2021-11-01",
+      "H": 16.0,
+      "S": 267.0,
+      "P90": 200.49,
+      "P99": 359.12,
+      "alert": true,
+      "severe": false,
+      "status": "Elevated"
+    },
+    {
+      "date": "2021-11-02",
+      "H": 10.0,
+      "S": 229.0,
+      "P90": 200.1,
+      "P99": 360.12,
+      "alert": true,
+      "severe": false,
+      "status": "Elevated"
+    },
+    {
+      "date": "2021-11-03",
+      "H": 2.0,
+      "S": 159.0,
+      "P90": 198.28,
+      "P99": 361.86,
+      "alert": false,
+      "severe": false,
+      "status": "Normal"
+    },
+    {
+      "date": "2021-11-04",
+      "H": 7.0,
+      "S": 124.0,
+      "P90": 198.28,
+      "P99": 361.86,
+      "alert": false,
+      "severe": false,
+      "status": "Normal"
+    },
+    {
+      "date": "2021-11-05",
+      "H": 0.0,
+      "S": 64.0,
+      "P90": 200.1,
+      "P99": 361.86,
+      "alert": false,
+      "severe": false,
+      "status": "Normal"
+    },
+    {
+      "date": "2021-11-06",
+      "H": 1.0,
+      "S": 50.0,
+      "P90": 198.38,
+      "P99": 361.86,
+      "alert": false,
+      "severe": false,
+      "status": "Normal"
+    },
+    {
+      "date": "2021-11-07",
+      "H": 2.0,
+      "S": 38.0,
+      "P90": 197.52,
+      "P99": 370.44,
+      "alert": false,
+      "severe": false,
+      "status": "Normal"
+    },
+    {
+      "date": "2021-11-08",
+      "H": 20.0,
+      "S": 42.0,
+      "P90": 198.38,
+      "P99": 387.37,
+      "alert": false,
+      "severe": false,
+      "status": "Normal"
+    },
+    {
+      "date": "2021-11-09",
+      "H": 32.0,
+      "S": 64.0,
+      "P90": 198.05,
+      "P99": 391.24,
+      "alert": false,
+      "severe": false,
+      "status": "Normal"
+    },
+    {
+      "date": "2021-11-10",
+      "H": 13.0,
+      "S": 75.0,
+      "P90": 196.29,
+      "P99": 393.6,
+      "alert": false,
+      "severe": false,
+      "status": "Normal"
+    },
+    {
+      "date": "2021-11-11",
+      "H": 30.0,
+      "S": 98.0,
+      "P90": 193.72,
+      "P99": 398.36,
+      "alert": false,
+      "severe": false,
+      "status": "Normal"
+    },
+    {
+      "date": "2021-11-12",
+      "H": 38.0,
+      "S": 136.0,
+      "P90": 193.72,
+      "P99": 402.2,
+      "alert": false,
+      "severe": false,
+      "status": "Normal"
+    },
+    {
+      "date": "2021-11-13",
+      "H": 24.0,
+      "S": 159.0,
+      "P90": 191.43,
+      "P99": 427.32,
+      "alert": false,
+      "severe": false,
+      "status": "Normal"
+    },
+    {
+      "date": "2021-11-14",
+      "H": 1.0,
+      "S": 158.0,
+      "P90": 189.63,
+      "P99": 554.68,
+      "alert": false,
+      "severe": false,
+      "status": "Normal"
+    },
+    {
+      "date": "2021-11-15",
+      "H": 14.0,
+      "S": 152.0,
+      "P90": 189.63,
+      "P99": 554.68,
+      "alert": false,
+      "severe": false,
+      "status": "Normal"
+    },
+    {
+      "date": "2021-11-16",
+      "H": 0.0,
+      "S": 120.0,
+      "P90": 189.06,
+      "P99": 554.68,
+      "alert": false,
+      "severe": false,
+      "status": "Normal"
+    },
+    {
+      "date": "2021-11-17",
+      "H": 1.0,
+      "S": 108.0,
+      "P90": 188.2,
+      "P99": 554.68,
+      "alert": false,
+      "severe": false,
+      "status": "Normal"
+    },
+    {
+      "date": "2021-11-18",
+      "H": 11.0,
+      "S": 89.0,
+      "P90": 182.4,
+      "P99": 554.68,
+      "alert": false,
+      "severe": false,
+      "status": "Normal"
+    },
+    {
+      "date": "2021-11-19",
+      "H": 19.0,
+      "S": 70.0,
+      "P90": 181.0,
+      "P99": 554.68,
+      "alert": false,
+      "severe": false,
+      "status": "Normal"
+    },
+    {
+      "date": "2021-11-20",
+      "H": 9.0,
+      "S": 55.0,
+      "P90": 181.0,
+      "P99": 554.68,
+      "alert": false,
+      "severe": false,
+      "status": "Normal"
+    },
+    {
+      "date": "2021-11-21",
+      "H": 2.0,
+      "S": 56.0,
+      "P90": 181.0,
+      "P99": 554.68,
+      "alert": false,
+      "severe": false,
+      "status": "Normal"
+    },
+    {
+      "date": "2021-11-22",
+      "H": 11.0,
+      "S": 53.0,
+      "P90": 178.6,
+      "P99": 554.68,
+      "alert": false,
+      "severe": false,
+      "status": "Normal"
+    },
+    {
+      "date": "2021-11-23",
+      "H": 12.0,
+      "S": 65.0,
+      "P90": 176.4,
+      "P99": 554.68,
+      "alert": false,
+      "severe": false,
+      "status": "Normal"
+    },
+    {
+      "date": "2021-11-24",
+      "H": 27.0,
+      "S": 91.0,
+      "P90": 168.8,
+      "P99": 554.68,
+      "alert": false,
+      "severe": false,
+      "status": "Normal"
+    },
+    {
+      "date": "2021-11-25",
+      "H": 3.0,
+      "S": 83.0,
+      "P90": 168.6,
+      "P99": 554.68,
+      "alert": false,
+      "severe": false,
+      "status": "Normal"
+    },
+    {
+      "date": "2021-11-26",
+      "H": 5.0,
+      "S": 69.0,
+      "P90": 168.6,
+      "P99": 554.68,
+      "alert": false,
+      "severe": false,
+      "status": "Normal"
+    },
+    {
+      "date": "2021-11-27",
+      "H": 5.0,
+      "S": 65.0,
+      "P90": 168.6,
+      "P99": 554.68,
+      "alert": false,
+      "severe": false,
+      "status": "Normal"
+    },
+    {
+      "date": "2021-11-28",
+      "H": 0.0,
+      "S": 63.0,
+      "P90": 168.6,
+      "P99": 554.68,
+      "alert": false,
+      "severe": false,
+      "status": "Normal"
+    },
+    {
+      "date": "2021-11-29",
+      "H": 1.0,
+      "S": 53.0,
+      "P90": 175.2,
+      "P99": 554.68,
+      "alert": false,
+      "severe": false,
+      "status": "Normal"
+    },
+    {
+      "date": "2021-11-30",
+      "H": 17.0,
+      "S": 58.0,
+      "P90": 177.0,
+      "P99": 554.68,
+      "alert": false,
+      "severe": false,
+      "status": "Normal"
+    },
+    {
+      "date": "2021-12-01",
+      "H": 7.0,
+      "S": 38.0,
+      "P90": 177.0,
+      "P99": 554.68,
+      "alert": false,
+      "severe": false,
+      "status": "Normal"
+    },
+    {
+      "date": "2021-12-02",
+      "H": 13.0,
+      "S": 48.0,
+      "P90": 177.0,
+      "P99": 554.68,
+      "alert": false,
+      "severe": false,
+      "status": "Normal"
+    },
+    {
+      "date": "2021-12-03",
+      "H": 23.0,
+      "S": 66.0,
+      "P90": 175.2,
+      "P99": 554.68,
+      "alert": false,
+      "severe": false,
+      "status": "Normal"
+    },
+    {
+      "date": "2021-12-04",
+      "H": 2.0,
+      "S": 63.0,
+      "P90": 164.33,
+      "P99": 554.68,
+      "alert": false,
+      "severe": false,
+      "status": "Normal"
+    },
+    {
+      "date": "2021-12-05",
+      "H": 7.0,
+      "S": 70.0,
+      "P90": 161.33,
+      "P99": 554.68,
+      "alert": false,
+      "severe": false,
+      "status": "Normal"
+    },
+    {
+      "date": "2021-12-06",
+      "H": 5.0,
+      "S": 74.0,
+      "P90": 155.95,
+      "P99": 554.68,
+      "alert": false,
+      "severe": false,
+      "status": "Normal"
+    },
+    {
+      "date": "2021-12-07",
+      "H": 43.0,
+      "S": 100.0,
+      "P90": 155.95,
+      "P99": 554.68,
+      "alert": false,
+      "severe": false,
+      "status": "Normal"
+    },
+    {
+      "date": "2021-12-08",
+      "H": 32.0,
+      "S": 125.0,
+      "P90": 156.15,
+      "P99": 554.68,
+      "alert": false,
+      "severe": false,
+      "status": "Normal"
+    },
+    {
+      "date": "2021-12-09",
+      "H": 23.0,
+      "S": 135.0,
+      "P90": 152.55,
+      "P99": 464.04,
+      "alert": false,
+      "severe": false,
+      "status": "Normal"
+    },
+    {
+      "date": "2021-12-10",
+      "H": 16.0,
+      "S": 128.0,
+      "P90": 151.97,
+      "P99": 408.4,
+      "alert": false,
+      "severe": false,
+      "status": "Normal"
+    },
+    {
+      "date": "2021-12-11",
+      "H": 2.0,
+      "S": 128.0,
+      "P90": 151.97,
+      "P99": 400.43,
+      "alert": false,
+      "severe": false,
+      "status": "Normal"
+    },
+    {
+      "date": "2021-12-12",
+      "H": 0.0,
+      "S": 121.0,
+      "P90": 151.97,
+      "P99": 394.72,
+      "alert": false,
+      "severe": false,
+      "status": "Normal"
+    },
+    {
+      "date": "2021-12-13",
+      "H": 0.0,
+      "S": 116.0,
+      "P90": 151.19,
+      "P99": 383.62,
+      "alert": false,
+      "severe": false,
+      "status": "Normal"
+    },
+    {
+      "date": "2021-12-14",
+      "H": 0.0,
+      "S": 73.0,
+      "P90": 151.19,
+      "P99": 383.62,
+      "alert": false,
+      "severe": false,
+      "status": "Normal"
+    },
+    {
+      "date": "2021-12-15",
+      "H": 15.0,
+      "S": 56.0,
+      "P90": 151.19,
+      "P99": 383.62,
+      "alert": false,
+      "severe": false,
+      "status": "Normal"
+    },
+    {
+      "date": "2021-12-16",
+      "H": 37.0,
+      "S": 70.0,
+      "P90": 150.2,
+      "P99": 383.62,
+      "alert": false,
+      "severe": false,
+      "status": "Normal"
+    },
+    {
+      "date": "2021-12-17",
+      "H": 29.0,
+      "S": 83.0,
+      "P90": 146.71,
+      "P99": 386.89,
+      "alert": false,
+      "severe": false,
+      "status": "Normal"
+    },
+    {
+      "date": "2021-12-18",
+      "H": 11.0,
+      "S": 92.0,
+      "P90": 146.03,
+      "P99": 382.65,
+      "alert": false,
+      "severe": false,
+      "status": "Normal"
+    },
+    {
+      "date": "2021-12-19",
+      "H": 18.0,
+      "S": 110.0,
+      "P90": 144.4,
+      "P99": 372.94,
+      "alert": false,
+      "severe": false,
+      "status": "Normal"
+    },
+    {
+      "date": "2021-12-20",
+      "H": 13.0,
+      "S": 123.0,
+      "P90": 144.4,
+      "P99": 372.94,
+      "alert": false,
+      "severe": false,
+      "status": "Normal"
+    },
+    {
+      "date": "2021-12-21",
+      "H": 21.0,
+      "S": 144.0,
+      "P90": 144.43,
+      "P99": 372.94,
+      "alert": false,
+      "severe": false,
+      "status": "Normal"
+    },
+    {
+      "date": "2021-12-22",
+      "H": 3.0,
+      "S": 132.0,
+      "P90": 149.24,
+      "P99": 372.94,
+      "alert": false,
+      "severe": false,
+      "status": "Normal"
+    },
+    {
+      "date": "2021-12-23",
+      "H": 60.0,
+      "S": 155.0,
+      "P90": 151.19,
+      "P99": 372.94,
+      "alert": false,
+      "severe": false,
+      "status": "Normal"
+    },
+    {
+      "date": "2021-12-24",
+      "H": 26.0,
+      "S": 152.0,
+      "P90": 151.97,
+      "P99": 386.89,
+      "alert": false,
+      "severe": false,
+      "status": "Normal"
+    },
+    {
+      "date": "2021-12-25",
+      "H": 9.0,
+      "S": 150.0,
+      "P90": 156.15,
+      "P99": 394.72,
+      "alert": false,
+      "severe": false,
+      "status": "Normal"
+    },
+    {
+      "date": "2021-12-26",
+      "H": 36.0,
+      "S": 168.0,
+      "P90": 163.66,
+      "P99": 403.6,
+      "alert": false,
+      "severe": false,
+      "status": "Normal"
+    },
+    {
+      "date": "2021-12-27",
+      "H": 123.0,
+      "S": 278.0,
+      "P90": 170.25,
+      "P99": 408.88,
+      "alert": false,
+      "severe": false,
+      "status": "Normal"
+    },
+    {
+      "date": "2021-12-28",
+      "H": 100.0,
+      "S": 357.0,
+      "P90": 186.87,
+      "P99": 422.62,
+      "alert": true,
+      "severe": false,
+      "status": "Elevated"
+    },
+    {
+      "date": "2021-12-29",
+      "H": 169.0,
+      "S": 523.0,
+      "P90": 187.63,
+      "P99": 422.62,
+      "alert": true,
+      "severe": false,
+      "status": "Elevated"
+    },
+    {
+      "date": "2021-12-30",
+      "H": 141.0,
+      "S": 604.0,
+      "P90": 189.97,
+      "P99": 431.42,
+      "alert": true,
+      "severe": false,
+      "status": "Elevated"
+    },
+    {
+      "date": "2021-12-31",
+      "H": 92.0,
+      "S": 670.0,
+      "P90": 191.36,
+      "P99": 445.14,
+      "alert": true,
+      "severe": true,
+      "status": "Extreme"
+    },
+    {
+      "date": "2022-01-01",
+      "H": 76.0,
+      "S": 737.0,
+      "P90": 191.36,
+      "P99": 445.14,
+      "alert": true,
+      "severe": true,
+      "status": "Extreme"
+    },
+    {
+      "date": "2022-01-02",
+      "H": 5.0,
+      "S": 706.0,
+      "P90": 191.36,
+      "P99": 445.14,
+      "alert": true,
+      "severe": true,
+      "status": "Extreme"
+    },
+    {
+      "date": "2022-01-03",
+      "H": 8.0,
+      "S": 591.0,
+      "P90": 191.36,
+      "P99": 445.14,
+      "alert": true,
+      "severe": true,
+      "status": "Extreme"
+    },
+    {
+      "date": "2022-01-04",
+      "H": 32.0,
+      "S": 523.0,
+      "P90": 191.36,
+      "P99": 445.14,
+      "alert": true,
+      "severe": true,
+      "status": "Extreme"
+    },
+    {
+      "date": "2022-01-05",
+      "H": 83.0,
+      "S": 437.0,
+      "P90": 195.88,
+      "P99": 445.14,
+      "alert": true,
+      "severe": false,
+      "status": "Elevated"
+    },
+    {
+      "date": "2022-01-06",
+      "H": 172.0,
+      "S": 468.0,
+      "P90": 197.28,
+      "P99": 445.14,
+      "alert": true,
+      "severe": false,
+      "status": "Elevated"
+    },
+    {
+      "date": "2022-01-07",
+      "H": 129.0,
+      "S": 505.0,
+      "P90": 207.7,
+      "P99": 445.14,
+      "alert": true,
+      "severe": false,
+      "status": "Elevated"
+    },
+    {
+      "date": "2022-01-08",
+      "H": 82.0,
+      "S": 511.0,
+      "P90": 211.21,
+      "P99": 460.69,
+      "alert": true,
+      "severe": true,
+      "status": "Extreme"
+    },
+    {
+      "date": "2022-01-09",
+      "H": 94.0,
+      "S": 600.0,
+      "P90": 211.21,
+      "P99": 470.11,
+      "alert": true,
+      "severe": true,
+      "status": "Extreme"
+    },
+    {
+      "date": "2022-01-10",
+      "H": 117.0,
+      "S": 709.0,
+      "P90": 215.1,
+      "P99": 476.5,
+      "alert": true,
+      "severe": true,
+      "status": "Extreme"
+    },
+    {
+      "date": "2022-01-11",
+      "H": 214.0,
+      "S": 891.0,
+      "P90": 220.15,
+      "P99": 495.56,
+      "alert": true,
+      "severe": true,
+      "status": "Extreme"
+    },
+    {
+      "date": "2022-01-12",
+      "H": 317.0,
+      "S": 1125.0,
+      "P90": 229.35,
+      "P99": 495.56,
+      "alert": true,
+      "severe": true,
+      "status": "Extreme"
+    },
+    {
+      "date": "2022-01-13",
+      "H": 361.0,
+      "S": 1314.0,
+      "P90": 240.34,
+      "P99": 501.17,
+      "alert": true,
+      "severe": true,
+      "status": "Extreme"
+    },
+    {
+      "date": "2022-01-14",
+      "H": 384.0,
+      "S": 1569.0,
+      "P90": 249.94,
+      "P99": 500.01,
+      "alert": true,
+      "severe": true,
+      "status": "Extreme"
+    },
+    {
+      "date": "2022-01-15",
+      "H": 234.0,
+      "S": 1721.0,
+      "P90": 250.15,
+      "P99": 500.01,
+      "alert": true,
+      "severe": true,
+      "status": "Extreme"
+    },
+    {
+      "date": "2022-01-16",
+      "H": 410.0,
+      "S": 2037.0,
+      "P90": 254.99,
+      "P99": 500.01,
+      "alert": true,
+      "severe": true,
+      "status": "Extreme"
+    },
+    {
+      "date": "2022-01-17",
+      "H": 288.0,
+      "S": 2208.0,
+      "P90": 257.06,
+      "P99": 501.17,
+      "alert": true,
+      "severe": true,
+      "status": "Extreme"
+    },
+    {
+      "date": "2022-01-18",
+      "H": 29.0,
+      "S": 2023.0,
+      "P90": 276.56,
+      "P99": 503.91,
+      "alert": true,
+      "severe": true,
+      "status": "Extreme"
+    },
+    {
+      "date": "2022-01-19",
+      "H": 115.0,
+      "S": 1821.0,
+      "P90": 283.04,
+      "P99": 515.63,
+      "alert": true,
+      "severe": true,
+      "status": "Extreme"
+    },
+    {
+      "date": "2022-01-20",
+      "H": 140.0,
+      "S": 1600.0,
+      "P90": 294.28,
+      "P99": 520.98,
+      "alert": true,
+      "severe": true,
+      "status": "Extreme"
+    },
+    {
+      "date": "2022-01-21",
+      "H": 190.0,
+      "S": 1406.0,
+      "P90": 305.1,
+      "P99": 531.47,
+      "alert": true,
+      "severe": true,
+      "status": "Extreme"
+    },
+    {
+      "date": "2022-01-22",
+      "H": 293.0,
+      "S": 1465.0,
+      "P90": 306.58,
+      "P99": 544.8,
+      "alert": true,
+      "severe": true,
+      "status": "Extreme"
+    },
+    {
+      "date": "2022-01-23",
+      "H": 172.0,
+      "S": 1227.0,
+      "P90": 311.08,
+      "P99": 578.78,
+      "alert": true,
+      "severe": true,
+      "status": "Extreme"
+    },
+    {
+      "date": "2022-01-24",
+      "H": 137.0,
+      "S": 1076.0,
+      "P90": 311.74,
+      "P99": 660.09,
+      "alert": true,
+      "severe": true,
+      "status": "Extreme"
+    },
+    {
+      "date": "2022-01-25",
+      "H": 20.0,
+      "S": 1067.0,
+      "P90": 313.24,
+      "P99": 716.8,
+      "alert": true,
+      "severe": true,
+      "status": "Extreme"
+    },
+    {
+      "date": "2022-01-26",
+      "H": 48.0,
+      "S": 1000.0,
+      "P90": 314.46,
+      "P99": 789.72,
+      "alert": true,
+      "severe": true,
+      "status": "Extreme"
+    },
+    {
+      "date": "2022-01-27",
+      "H": 29.0,
+      "S": 889.0,
+      "P90": 326.68,
+      "P99": 832.38,
+      "alert": true,
+      "severe": true,
+      "status": "Extreme"
+    },
+    {
+      "date": "2022-01-28",
+      "H": 209.0,
+      "S": 908.0,
+      "P90": 343.91,
+      "P99": 838.61,
+      "alert": true,
+      "severe": true,
+      "status": "Extreme"
+    },
+    {
+      "date": "2022-01-29",
+      "H": 178.0,
+      "S": 793.0,
+      "P90": 363.15,
+      "P99": 851.89,
+      "alert": true,
+      "severe": false,
+      "status": "Elevated"
+    },
+    {
+      "date": "2022-01-30",
+      "H": 135.0,
+      "S": 756.0,
+      "P90": 387.04,
+      "P99": 891.12,
+      "alert": true,
+      "severe": false,
+      "status": "Elevated"
+    },
+    {
+      "date": "2022-01-31",
+      "H": 224.0,
+      "S": 843.0,
+      "P90": 404.33,
+      "P99": 921.08,
+      "alert": true,
+      "severe": false,
+      "status": "Elevated"
+    },
+    {
+      "date": "2022-02-01",
+      "H": 351.0,
+      "S": 1174.0,
+      "P90": 425.64,
+      "P99": 921.08,
+      "alert": true,
+      "severe": false,
+      "status": "Elevated"
+    },
+    {
+      "date": "2022-02-02",
+      "H": 464.0,
+      "S": 1590.0,
+      "P90": 445.37,
+      "P99": 927.94,
+      "alert": true,
+      "severe": false,
+      "status": "Elevated"
+    },
+    {
+      "date": "2022-02-03",
+      "H": 114.0,
+      "S": 1675.0,
+      "P90": 450.89,
+      "P99": 949.52,
+      "alert": true,
+      "severe": true,
+      "status": "Extreme"
+    },
+    {
+      "date": "2022-02-04",
+      "H": 93.0,
+      "S": 1559.0,
+      "P90": 460.78,
+      "P99": 949.7,
+      "alert": true,
+      "severe": true,
+      "status": "Extreme"
+    },
+    {
+      "date": "2022-02-05",
+      "H": 95.0,
+      "S": 1476.0,
+      "P90": 472.19,
+      "P99": 956.97,
+      "alert": true,
+      "severe": true,
+      "status": "Extreme"
+    },
+    {
+      "date": "2022-02-06",
+      "H": 191.0,
+      "S": 1532.0,
+      "P90": 483.17,
+      "P99": 1002.12,
+      "alert": true,
+      "severe": true,
+      "status": "Extreme"
+    },
+    {
+      "date": "2022-02-07",
+      "H": 271.0,
+      "S": 1579.0,
+      "P90": 500.38,
+      "P99": 1004.08,
+      "alert": true,
+      "severe": true,
+      "status": "Extreme"
+    },
+    {
+      "date": "2022-02-08",
+      "H": 230.0,
+      "S": 1458.0,
+      "P90": 515.42,
+      "P99": 1004.08,
+      "alert": true,
+      "severe": true,
+      "status": "Extreme"
+    },
+    {
+      "date": "2022-02-09",
+      "H": 221.0,
+      "S": 1215.0,
+      "P90": 526.35,
+      "P99": 1004.08,
+      "alert": true,
+      "severe": true,
+      "status": "Extreme"
+    },
+    {
+      "date": "2022-02-10",
+      "H": 296.0,
+      "S": 1397.0,
+      "P90": 530.53,
+      "P99": 1004.08,
+      "alert": true,
+      "severe": true,
+      "status": "Extreme"
+    },
+    {
+      "date": "2022-02-11",
+      "H": 390.0,
+      "S": 1694.0,
+      "P90": 533.8,
+      "P99": 1004.08,
+      "alert": true,
+      "severe": true,
+      "status": "Extreme"
+    },
+    {
+      "date": "2022-02-12",
+      "H": 163.0,
+      "S": 1762.0,
+      "P90": 543.39,
+      "P99": 1004.08,
+      "alert": true,
+      "severe": true,
+      "status": "Extreme"
+    },
+    {
+      "date": "2022-02-13",
+      "H": 263.0,
+      "S": 1834.0,
+      "P90": 556.07,
+      "P99": 1004.08,
+      "alert": true,
+      "severe": true,
+      "status": "Extreme"
+    },
+    {
+      "date": "2022-02-14",
+      "H": 274.0,
+      "S": 1837.0,
+      "P90": 568.7,
+      "P99": 1004.08,
+      "alert": true,
+      "severe": true,
+      "status": "Extreme"
+    },
+    {
+      "date": "2022-02-15",
+      "H": 384.0,
+      "S": 1991.0,
+      "P90": 571.34,
+      "P99": 1015.67,
+      "alert": true,
+      "severe": true,
+      "status": "Extreme"
+    },
+    {
+      "date": "2022-02-16",
+      "H": 408.0,
+      "S": 2178.0,
+      "P90": 575.76,
+      "P99": 1051.69,
+      "alert": true,
+      "severe": true,
+      "status": "Extreme"
+    },
+    {
+      "date": "2022-02-17",
+      "H": 396.0,
+      "S": 2278.0,
+      "P90": 601.89,
+      "P99": 1119.79,
+      "alert": true,
+      "severe": true,
+      "status": "Extreme"
+    },
+    {
+      "date": "2022-02-18",
+      "H": 499.0,
+      "S": 2387.0,
+      "P90": 622.21,
+      "P99": 1161.31,
+      "alert": true,
+      "severe": true,
+      "status": "Extreme"
+    },
+    {
+      "date": "2022-02-19",
+      "H": 478.0,
+      "S": 2702.0,
+      "P90": 631.83,
+      "P99": 1179.9,
+      "alert": true,
+      "severe": true,
+      "status": "Extreme"
+    },
+    {
+      "date": "2022-02-20",
+      "H": 152.0,
+      "S": 2591.0,
+      "P90": 644.48,
+      "P99": 1188.99,
+      "alert": true,
+      "severe": true,
+      "status": "Extreme"
+    },
+    {
+      "date": "2022-02-21",
+      "H": 62.0,
+      "S": 2379.0,
+      "P90": 666.89,
+      "P99": 1241.65,
+      "alert": true,
+      "severe": true,
+      "status": "Extreme"
+    },
+    {
+      "date": "2022-02-22",
+      "H": 163.0,
+      "S": 2158.0,
+      "P90": 666.89,
+      "P99": 1496.64,
+      "alert": true,
+      "severe": true,
+      "status": "Extreme"
+    },
+    {
+      "date": "2022-02-23",
+      "H": 283.0,
+      "S": 2033.0,
+      "P90": 650.4,
+      "P99": 1821.46,
+      "alert": true,
+      "severe": true,
+      "status": "Extreme"
+    },
+    {
+      "date": "2022-02-24",
+      "H": 200.0,
+      "S": 1837.0,
+      "P90": 644.48,
+      "P99": 1821.46,
+      "alert": true,
+      "severe": true,
+      "status": "Extreme"
+    },
+    {
+      "date": "2022-02-25",
+      "H": 45.0,
+      "S": 1383.0,
+      "P90": 637.6,
+      "P99": 1821.46,
+      "alert": true,
+      "severe": false,
+      "status": "Elevated"
+    },
+    {
+      "date": "2022-02-26",
+      "H": 105.0,
+      "S": 1010.0,
+      "P90": 631.83,
+      "P99": 1821.46,
+      "alert": true,
+      "severe": false,
+      "status": "Elevated"
+    },
+    {
+      "date": "2022-02-27",
+      "H": 113.0,
+      "S": 971.0,
+      "P90": 571.06,
+      "P99": 1821.46,
+      "alert": true,
+      "severe": false,
+      "status": "Elevated"
+    },
+    {
+      "date": "2022-02-28",
+      "H": 52.0,
+      "S": 961.0,
+      "P90": 571.06,
+      "P99": 1821.46,
+      "alert": true,
+      "severe": false,
+      "status": "Elevated"
+    },
+    {
+      "date": "2022-03-01",
+      "H": 4.0,
+      "S": 802.0,
+      "P90": 586.42,
+      "P99": 1821.46,
+      "alert": true,
+      "severe": false,
+      "status": "Elevated"
+    },
+    {
+      "date": "2022-03-02",
+      "H": 16.0,
+      "S": 535.0,
+      "P90": 619.76,
+      "P99": 1821.46,
+      "alert": false,
+      "severe": false,
+      "status": "Normal"
+    },
+    {
+      "date": "2022-03-03",
+      "H": 21.0,
+      "S": 356.0,
+      "P90": 638.08,
+      "P99": 1821.46,
+      "alert": false,
+      "severe": false,
+      "status": "Normal"
+    },
+    {
+      "date": "2022-03-04",
+      "H": 15.0,
+      "S": 326.0,
+      "P90": 647.92,
+      "P99": 1821.46,
+      "alert": false,
+      "severe": false,
+      "status": "Normal"
+    },
+    {
+      "date": "2022-03-05",
+      "H": 32.0,
+      "S": 253.0,
+      "P90": 655.64,
+      "P99": 1821.46,
+      "alert": false,
+      "severe": false,
+      "status": "Normal"
+    },
+    {
+      "date": "2022-03-06",
+      "H": 18.0,
+      "S": 158.0,
+      "P90": 666.28,
+      "P99": 1821.46,
+      "alert": false,
+      "severe": false,
+      "status": "Normal"
+    },
+    {
+      "date": "2022-03-07",
+      "H": 44.0,
+      "S": 150.0,
+      "P90": 666.28,
+      "P99": 1821.46,
+      "alert": false,
+      "severe": false,
+      "status": "Normal"
+    },
+    {
+      "date": "2022-03-08",
+      "H": 0.0,
+      "S": 146.0,
+      "P90": 662.84,
+      "P99": 1821.46,
+      "alert": false,
+      "severe": false,
+      "status": "Normal"
+    },
+    {
+      "date": "2022-03-09",
+      "H": 6.0,
+      "S": 136.0,
+      "P90": 655.64,
+      "P99": 1821.46,
+      "alert": false,
+      "severe": false,
+      "status": "Normal"
+    },
+    {
+      "date": "2022-03-10",
+      "H": 0.0,
+      "S": 115.0,
+      "P90": 655.64,
+      "P99": 1821.46,
+      "alert": false,
+      "severe": false,
+      "status": "Normal"
+    },
+    {
+      "date": "2022-03-11",
+      "H": 11.0,
+      "S": 111.0,
+      "P90": 655.64,
+      "P99": 1821.46,
+      "alert": false,
+      "severe": false,
+      "status": "Normal"
+    },
+    {
+      "date": "2022-03-12",
+      "H": 11.0,
+      "S": 90.0,
+      "P90": 655.64,
+      "P99": 1821.46,
+      "alert": false,
+      "severe": false,
+      "status": "Normal"
+    },
+    {
+      "date": "2022-03-13",
+      "H": 8.0,
+      "S": 80.0,
+      "P90": 655.64,
+      "P99": 1890.89,
+      "alert": false,
+      "severe": false,
+      "status": "Normal"
+    },
+    {
+      "date": "2022-03-14",
+      "H": 19.0,
+      "S": 55.0,
+      "P90": 655.64,
+      "P99": 1890.89,
+      "alert": false,
+      "severe": false,
+      "status": "Normal"
+    },
+    {
+      "date": "2022-03-15",
+      "H": 37.0,
+      "S": 92.0,
+      "P90": 662.84,
+      "P99": 1890.89,
+      "alert": false,
+      "severe": false,
+      "status": "Normal"
+    },
+    {
+      "date": "2022-03-16",
+      "H": 38.0,
+      "S": 124.0,
+      "P90": 668.11,
+      "P99": 1890.89,
+      "alert": false,
+      "severe": false,
+      "status": "Normal"
+    },
+    {
+      "date": "2022-03-17",
+      "H": 33.0,
+      "S": 157.0,
+      "P90": 672.01,
+      "P99": 1890.89,
+      "alert": false,
+      "severe": false,
+      "status": "Normal"
+    },
+    {
+      "date": "2022-03-18",
+      "H": 15.0,
+      "S": 161.0,
+      "P90": 676.45,
+      "P99": 1890.89,
+      "alert": false,
+      "severe": false,
+      "status": "Normal"
+    },
+    {
+      "date": "2022-03-19",
+      "H": 29.0,
+      "S": 179.0,
+      "P90": 680.2,
+      "P99": 1890.89,
+      "alert": false,
+      "severe": false,
+      "status": "Normal"
+    },
+    {
+      "date": "2022-03-20",
+      "H": 38.0,
+      "S": 209.0,
+      "P90": 689.19,
+      "P99": 1890.89,
+      "alert": false,
+      "severe": false,
+      "status": "Normal"
+    },
+    {
+      "date": "2022-03-21",
+      "H": 52.0,
+      "S": 242.0,
+      "P90": 689.19,
+      "P99": 1801.83,
+      "alert": false,
+      "severe": false,
+      "status": "Normal"
+    },
+    {
+      "date": "2022-03-22",
+      "H": 6.0,
+      "S": 211.0,
+      "P90": 689.19,
+      "P99": 1781.86,
+      "alert": false,
+      "severe": false,
+      "status": "Normal"
+    },
+    {
+      "date": "2022-03-23",
+      "H": 0.0,
+      "S": 173.0,
+      "P90": 680.2,
+      "P99": 1764.14,
+      "alert": false,
+      "severe": false,
+      "status": "Normal"
+    },
+    {
+      "date": "2022-03-24",
+      "H": 2.0,
+      "S": 142.0,
+      "P90": 680.2,
+      "P99": 1752.5,
+      "alert": false,
+      "severe": false,
+      "status": "Normal"
+    },
+    {
+      "date": "2022-03-25",
+      "H": 8.0,
+      "S": 135.0,
+      "P90": 676.45,
+      "P99": 1715.98,
+      "alert": false,
+      "severe": false,
+      "status": "Normal"
+    },
+    {
+      "date": "2022-03-26",
+      "H": 6.0,
+      "S": 112.0,
+      "P90": 672.01,
+      "P99": 1673.59,
+      "alert": false,
+      "severe": false,
+      "status": "Normal"
+    },
+    {
+      "date": "2022-03-27",
+      "H": 8.0,
+      "S": 82.0,
+      "P90": 668.11,
+      "P99": 1549.08,
+      "alert": false,
+      "severe": false,
+      "status": "Normal"
+    },
+    {
+      "date": "2022-03-28",
+      "H": 25.0,
+      "S": 55.0,
+      "P90": 666.28,
+      "P99": 1549.08,
+      "alert": false,
+      "severe": false,
+      "status": "Normal"
+    },
+    {
+      "date": "2022-03-29",
+      "H": 34.0,
+      "S": 83.0,
+      "P90": 662.84,
+      "P99": 1549.08,
+      "alert": false,
+      "severe": false,
+      "status": "Normal"
+    },
+    {
+      "date": "2022-03-30",
+      "H": 0.0,
+      "S": 83.0,
+      "P90": 666.28,
+      "P99": 1549.08,
+      "alert": false,
+      "severe": false,
+      "status": "Normal"
+    },
+    {
+      "date": "2022-03-31",
+      "H": 20.0,
+      "S": 101.0,
+      "P90": 668.11,
+      "P99": 1549.08,
+      "alert": false,
+      "severe": false,
+      "status": "Normal"
+    }
+  ],
+  "reported_official": [
+    {
+      "fact": "INTA Corrientes report (18 Feb 2022): burned area growing ~30,000 ha per day in recent days (cited inside DNU 335/2022)",
+      "label": "reported (official source)",
+      "verified": false,
+      "source_url": "https://aldiaargentina.microjuris.com/2022/02/24/legislacion-incendios-se-declara-a-la-provincia-de-corrientes-zona-de-desastre-ecologico-y-ambiental-debido-a-los-estragos-ocasionados-en-la-fauna-la-flora-y-la-biodiversidad/"
+    }
+  ]
+}
