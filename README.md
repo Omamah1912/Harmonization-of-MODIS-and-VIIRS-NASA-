@@ -71,6 +71,7 @@ Tests: `pytest backend/tests pipeline/tests`.
   and deploy `frontend/dist`.
 - If the API is slow or down, the frontend falls back to precomputed results for the preset areas
   (`frontend/public/fallback/`) and shows a **cached** badge.
+- Source: https://github.com/Omamah1912/Harmonization-of-MODIS-and-VIIRS-NASA-
 - Local one-command backup: `cd frontend && npm run build`, then `uvicorn backend.app.main:app --port 8000`.
 
 ## Repository
