@@ -308,3 +308,91 @@ footer.credits { grid-column: 1 / -1; color: var(--ink-400); font-size: 11px; li
   .tb-right .btn span { display: none; }
   .status { padding: 0 10px; }
 }
+
+/* ================================================================ transitions & polish (v2) */
+@property --accent { syntax: '<color>'; inherits: true; initial-value: #4FD1C5; }
+.app { transition: --accent .6s ease; position: relative; isolation: isolate; }
+.app::before { content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background: radial-gradient(ellipse 60% 40% at 78% -8%, color-mix(in srgb, var(--accent) 9%, transparent), transparent 70%),
+              radial-gradient(ellipse 50% 30% at 10% 108%, rgba(237, 105, 37, .06), transparent 70%); }
+.topbar { background: linear-gradient(180deg, #0d121d, rgba(11, 15, 23, .92)); backdrop-filter: blur(8px); }
+button.logo { background: none; border: 0; padding: 0; color: var(--ink-100); cursor: pointer; }
+button.logo:hover svg { filter: drop-shadow(0 0 6px rgba(251, 155, 6, .8)); }
+
+/* lens tabs: sliding pill */
+.tabs { position: relative; }
+.tabs button { position: relative; z-index: 1; }
+.tabs button.on { background: transparent; border-color: transparent; }
+.tab-pill { position: absolute; top: 4px; left: 4px; height: 36px; border-radius: 999px; z-index: 0;
+  background: color-mix(in srgb, var(--c) 16%, transparent); border: 1px solid color-mix(in srgb, var(--c) 50%, transparent);
+  box-shadow: 0 0 18px color-mix(in srgb, var(--c) 18%, transparent);
+  transition: transform .5s cubic-bezier(.34, 1.4, .64, 1), width .5s cubic-bezier(.34, 1.4, .64, 1), background .4s, border-color .4s; }
+
+/* layout morphs between lenses */
+.body { transition: grid-template-columns .6s cubic-bezier(.65, 0, .25, 1), gap .6s; }
+.stage { transition: opacity .45s, filter .45s; }
+.lens-research .stage { opacity: 0; visibility: visible; pointer-events: none; }
+.panel { animation: panelIn .5s cubic-bezier(.2, .8, .2, 1) both; padding-bottom: 28px;
+  -webkit-mask-image: linear-gradient(180deg, #000 calc(100% - 32px), transparent); mask-image: linear-gradient(180deg, #000 calc(100% - 32px), transparent); }
+@keyframes panelIn { from { opacity: 0; transform: translateX(28px); } }
+.lens-ranger .panel, .lens-research .panel { animation-name: panelUp; }
+@keyframes panelUp { from { opacity: 0; transform: translateY(22px); } }
+
+/* cards: depth + accent edge on hover */
+.card { background: linear-gradient(180deg, #161d2e 0%, #121826 46%); box-shadow: 0 1px 0 rgba(255, 255, 255, .03) inset, 0 12px 30px rgba(0, 0, 0, .18); }
+.card::before { content: ''; position: absolute; left: 18px; right: 18px; top: -1px; height: 1px; border-radius: 1px; opacity: 0;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent); transition: opacity .3s; }
+.card:hover::before { opacity: .7; }
+.card:hover { transform: translateY(-2px); }
+.card { transition: border-color .2s, box-shadow .25s, transform .25s cubic-bezier(.34, 1.56, .64, 1); }
+.card-h h3 { letter-spacing: -.005em; }
+.big { transition: color .3s; }
+
+/* loading: dim, never blank */
+.app.is-loading .panel > .card { opacity: .5; filter: saturate(.55); }
+.panel > .card { transition: opacity .3s, filter .3s, border-color .2s, box-shadow .25s, transform .25s cubic-bezier(.34, 1.56, .64, 1); }
+
+/* entering after the opening: the app assembles */
+.app.entering .topbar { animation: dropIn .7s .05s cubic-bezier(.2, .8, .2, 1) both; }
+.app.entering .stage { animation: stageIn 1.1s cubic-bezier(.2, .8, .2, 1) both; }
+.app.entering .panel { animation-delay: .35s; }
+.app.entering .dock { animation: upIn .7s .55s cubic-bezier(.2, .8, .2, 1) both; }
+.app.entering .rail { animation: railIn .6s .7s cubic-bezier(.34, 1.56, .64, 1) both; }
+@keyframes dropIn { from { opacity: 0; transform: translateY(-24px); } }
+@keyframes upIn { from { opacity: 0; transform: translateY(30px); } }
+@keyframes stageIn { from { opacity: 0; transform: scale(1.08); filter: blur(8px); } }
+@keyframes railIn { from { opacity: 0; transform: translateX(-20px) scale(.9); } }
+.orb-card { animation: cardIn .55s .15s var(--spring) both; }
+.app.entering .orb-card { animation-delay: .9s; }
+
+/* replay: cinema mode */
+.app.replay .panel { opacity: .42; filter: saturate(.4); transition: opacity .6s, filter .6s; }
+.app.replay .panel:hover { opacity: .9; filter: none; }
+.app .topbar { transition: opacity .5s; }
+.stage::before, .stage::after { content: ''; position: absolute; left: 0; right: 0; height: 0; z-index: 3; background: #05070c; transition: height .7s cubic-bezier(.65, 0, .25, 1); pointer-events: none; }
+.stage::before { top: 0; } .stage::after { bottom: 0; }
+.app.replay .stage::before, .app.replay .stage::after { height: 44px; }
+.app.replay .stage { border-color: #3d3216; box-shadow: 0 0 0 1px rgba(247, 209, 61, .08), 0 0 60px rgba(247, 209, 61, .05); }
+.replay-head, .replay-date { animation: cardIn .6s .35s var(--spring) both; }
+.replay-head { top: 52px; } .replay-date { top: 52px; }
+.cine-card { position: absolute; inset: 0; z-index: 5; display: grid; place-content: center; text-align: center; gap: 10px; pointer-events: none;
+  background: radial-gradient(ellipse at center, rgba(5, 7, 12, .78), rgba(5, 7, 12, .35) 70%); animation: cine 1.9s ease-in-out both; }
+.cine-card .tag { color: var(--gold); }
+.cine-card b { font: 700 clamp(28px, 4vw, 48px)/1.1 var(--display); letter-spacing: -.01em; }
+.cine-card span:last-child { color: var(--ink-300); font-size: 14px; }
+@keyframes cine { 0% { opacity: 0; transform: scale(1.04); } 18%, 78% { opacity: 1; transform: none; } 100% { opacity: 0; transform: scale(.98); } }
+.tick { display: block; animation: tickIn .35s cubic-bezier(.2, .8, .2, 1); }
+@keyframes tickIn { from { opacity: 0; transform: translateY(-10px); filter: blur(2px); } }
+.end-card { animation: endIn .8s var(--spring) both; }
+@keyframes endIn { from { opacity: 0; transform: translateY(30px) scale(.9); } }
+
+/* status changes glide */
+.status { transition: color .4s, background .4s, border-color .4s; }
+.orb { transition: background .5s, box-shadow .5s; }
+
+/* softer map overlays */
+.rail, .orb-card, .sel-card, .map-legend, .replay-date, .pop { box-shadow: 0 16px 40px rgba(0, 0, 0, .35); }
+.map-legend { backdrop-filter: blur(6px); }
+.dock { background: linear-gradient(0deg, #0a0e16, var(--night-900)); }
+.dock .play { box-shadow: 0 0 0 0 rgba(247, 209, 61, 0); transition: box-shadow .3s, transform .15s; }
+.dock .play:hover { box-shadow: 0 0 24px rgba(247, 209, 61, .25); }

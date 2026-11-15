@@ -37,6 +37,8 @@ export default function MapView({ coverage, aoi, detections, drawMode, accent, o
   const map = useRef<maplibregl.Map | null>(null)
   const draw = useRef<TerraDraw | null>(null)
   const [ready, setReady] = useState(false)
+  const fitB = useRef<[[number, number], [number, number]] | null>(null)
+  const userMoved = useRef(false)
   const cb = useRef({ onDraw, onPin, onModeDone, drawMode })
   cb.current = { onDraw, onPin, onModeDone, drawMode }
 
@@ -47,7 +49,18 @@ export default function MapView({ coverage, aoi, detections, drawMode, accent, o
     })
     m.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'bottom-right')
     map.current = m
-    const ro = new ResizeObserver(() => m.resize())
+    // keep the selected area framed while the layout morphs (lens switch), unless the user moved the map
+    let settle = 0
+    const ro = new ResizeObserver(() => {
+      m.resize()
+      window.clearTimeout(settle)
+      settle = window.setTimeout(() => {
+        if (fitB.current && !userMoved.current && m.getContainer().clientWidth > 50)
+          m.fitBounds(fitB.current, { padding: 50, duration: 500, maxZoom: 10 })
+      }, 140)
+    })
+    m.on('dragstart', () => { userMoved.current = true })
+    m.on('zoomstart', e => { if ((e as any).originalEvent) userMoved.current = true })
     ro.observe(div.current!)
     m.on('load', () => {
       m.addSource('mask', { type: 'geojson', data: EMPTY })
@@ -138,6 +151,19 @@ export default function MapView({ coverage, aoi, detections, drawMode, accent, o
     if (!ready) return
     const src = map.current!.getSource('aoi') as maplibregl.GeoJSONSource
     src.setData(aoi ? ({ type: 'Feature', geometry: aoi, properties: {} } as any) : EMPTY)
+    // "claimed plot": the outline flares, then settles (≈ 1 s)
+    if (!aoi) return
+    const m = map.current!, t0 = performance.now()
+    let raf = 0
+    const step = (t: number) => {
+      const k = Math.min(1, (t - t0) / 1100), e = 1 - Math.pow(1 - k, 3)
+      m.setPaintProperty('aoi-glow', 'line-width', 22 - 16 * e)
+      m.setPaintProperty('aoi-glow', 'line-opacity', 0.95 - 0.55 * e)
+      m.setPaintProperty('aoi-fill', 'fill-opacity', 0.28 - 0.2 * e)
+      if (k < 1) raf = requestAnimationFrame(step)
+    }
+    raf = requestAnimationFrame(step)
+    return () => cancelAnimationFrame(raf)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ready, aoi])
 
@@ -145,6 +171,8 @@ export default function MapView({ coverage, aoi, detections, drawMode, accent, o
     if (!ready || !aoi) return
     const coords: number[][] = JSON.stringify(aoi.coordinates).match(/-?\d+\.?\d*,-?\d+\.?\d*/g)!.map(s => s.split(',').map(Number))
     const xs = coords.map(c => c[0]), ys = coords.map(c => c[1])
+    fitB.current = [[Math.min(...xs), Math.min(...ys)], [Math.max(...xs), Math.max(...ys)]]
+    userMoved.current = false
     // wait for layout (the stage may have just become visible or changed width)
     const t = window.setTimeout(() => {
       const m = map.current!

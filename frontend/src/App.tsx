@@ -3,6 +3,7 @@ import { Component, forwardRef, useCallback, useEffect, useMemo, useRef, useStat
 import { ApiError, downloadCsv, get, post } from './api'
 import { AnnualAnomaly, BridgeFactors, ember, EmberCalendar, FireClock, fmt, MonthlyAnomalyGrid, MONTHS, SeamSplitter, SeasonBars, WhoSawWhat } from './charts'
 import { MainDock, ReplayDock } from './Dock'
+import Intro from './Intro'
 import MapView, { type DrawMode } from './MapView'
 import type { AOI, Backtest, Detections, EventsResult, Filters, Geometry, Methods, Preset, QueryResult, ReplayResult, Status } from './types'
 import './App.css'
@@ -42,6 +43,53 @@ class Boundary extends Component<{ children: ReactNode; resetKey: string }, { er
   static getDerivedStateFromError(e: Error) { return { err: e.message } }
   static getDerivedStateFromProps(p: { resetKey: string }, s: { err: string | null; key: string }) { return p.resetKey !== s.key ? { err: null, key: p.resetKey } : null }
   render() { return this.state.err ? <div className="panel"><div className="card"><h3 style={{ margin: 0 }}>This view hit a problem</h3><p className="note">{this.state.err}</p></div></div> : this.props.children }
+}
+
+// crisp data motion: numbers count up (FRONTEND.md §2 motion)
+function CountUp({ value, digits = 0, prefix = '', suffix = '' }: { value: number | null | undefined; digits?: number; prefix?: string; suffix?: string }) {
+  const [v, setV] = useState(value ?? 0)
+  const from = useRef(value ?? 0)
+  useEffect(() => {
+    if (value == null) return
+    const a = from.current, b = value, t0 = performance.now(), dur = 650
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) { setV(b); from.current = b; return }
+    let raf = 0
+    const step = (t: number) => {
+      const k = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - k, 3)
+      setV(a + (b - a) * e)
+      if (k < 1) raf = requestAnimationFrame(step); else from.current = b
+    }
+    raf = requestAnimationFrame(step)
+    return () => { cancelAnimationFrame(raf); from.current = b }
+  }, [value])
+  if (value == null) return <>—</>
+  return <>{prefix}{v.toLocaleString('en-US', { minimumFractionDigits: digits, maximumFractionDigits: digits })}{suffix}</>
+}
+
+// sliding pill behind the active lens tab
+function Tabs({ lens, setLens }: { lens: Lens; setLens: (l: Lens) => void }) {
+  const ref = useRef<HTMLElement>(null)
+  const [pill, setPill] = useState<{ x: number; w: number } | null>(null)
+  useEffect(() => {
+    const place = () => {
+      const b = ref.current?.querySelector<HTMLButtonElement>(`button[data-l="${lens}"]`)
+      if (b) setPill({ x: b.offsetLeft, w: b.offsetWidth })
+    }
+    place()
+    const ro = new ResizeObserver(place); if (ref.current) ro.observe(ref.current)
+    return () => ro.disconnect()
+  }, [lens])
+  const c = LENSES.find(l => l.id === lens)!.color
+  return (
+    <nav className="tabs" aria-label="Lens" ref={ref}>
+      {pill && <span className="tab-pill" style={{ transform: `translateX(${pill.x - 4}px)`, width: pill.w, ['--c' as any]: c }} />}
+      {LENSES.map(l => (
+        <button key={l.id} data-l={l.id} className={lens === l.id ? 'on' : ''} style={{ ['--c' as any]: l.color }} onClick={() => setLens(l.id)} aria-pressed={lens === l.id}>
+          <i className="dot" />{l.name}
+        </button>
+      ))}
+    </nav>
+  )
 }
 
 // ---------------------------------------------------------------- icons (2 px rounded strokes)
@@ -92,7 +140,9 @@ export default function App() {
   const [drawMode, setDrawMode] = useState<DrawMode>('none')
   const [pop, setPop] = useState<Pop>(null)
   const [modal, setModal] = useState<null | 'card' | 'methods'>(null)
-  const [intro, setIntro] = useState(() => store.get('emberline_intro') !== 'seen')
+  const [intro, setIntro] = useState(() => store.get('emberline_intro') !== 'seen' || new URLSearchParams(location.search).has('intro'))
+  const [entering, setEntering] = useState(false)
+  const [cine, setCine] = useState(false)   // replay title card
   // replay
   const [replayMode, setReplayMode] = useState(false)
   const [playing, setPlaying] = useState(false)
@@ -193,7 +243,12 @@ export default function App() {
   const runReplay = async (from = REPLAY_START) => {
     setAoiSel({ kind: 'preset', id: 'corrientes' }); setSelMonth(null); setReplayMode(true); setReplayDone(false)
     setLens('response'); setPlaying(true); setPop(null); setDrawMode('none')
-    if (from === REPLAY_START) { prevLevel.current = 'Normal'; seenFlags.current = new Set() }
+    if (from === REPLAY_START) {
+      prevLevel.current = 'Normal'; seenFlags.current = new Set(); setReplayDate(REPLAY_START)
+      setCine(true)
+      await new Promise(res => setTimeout(res, 1900))
+      setCine(false)
+    }
     playRef.current = true
     let d = from
     while (playRef.current && d <= REPLAY_END) {
@@ -227,7 +282,10 @@ export default function App() {
     setSelMonth(null); setPop(null)
     setAoiSel({ kind: 'circle', lat, lon, radius_km: pin.r })
   }
-  const choosePost = (l: Lens) => { setLens(l); setIntro(false); store.set('emberline_intro', 'seen') }
+  const choosePost = (l: Lens) => {
+    setLens(l); setIntro(false); store.set('emberline_intro', 'seen')
+    setEntering(true); window.setTimeout(() => setEntering(false), 1600)
+  }
   const tryOwnArea = () => { exitReplay(); setDrawMode('rectangle') }
 
   const status = q?.summary.status
@@ -237,22 +295,16 @@ export default function App() {
   const lensColor = LENSES.find(l => l.id === lens)!.color
 
   return (
-    <div className={`app lens-${lens}${replayMode ? ' replay' : ''}`}>
+    <div className={`app lens-${lens}${replayMode ? ' replay' : ''}${entering ? ' entering' : ''}${loading ? ' is-loading' : ''}${intro ? ' behind-intro' : ''}`}>
       {/* ------------------------------------------------------ top bar */}
       <header className="topbar">
         <div className="tb-left">
-          <div className="logo"><Logo /> EMBERLINE</div>
+          <button className="logo" onClick={() => setIntro(true)} title="Replay the opening"><Logo /> EMBERLINE</button>
           <span className="sep" />
           <span className="region" title="Coverage: Corrientes, Argentina">Corrientes, AR</span>
           <span className="chip aoi" title={aoiName}><i className="dot" /><span>{aoiName}</span></span>
         </div>
-        <nav className="tabs" aria-label="Lens">
-          {LENSES.map(l => (
-            <button key={l.id} className={lens === l.id ? 'on' : ''} style={{ ['--c' as any]: l.color }} onClick={() => setLens(l.id)} aria-pressed={lens === l.id}>
-              <i className="dot" />{l.name}
-            </button>
-          ))}
-        </nav>
+        <Tabs lens={lens} setLens={setLens} />
         <div className="tb-right">
           {q && <span className={`status s-${lvlKey(level)}`} title={status?.sentence}><span className="ico">{LEVEL_ICON[level]}</span>{level}</span>}
           <span className="chip hide-sm" title="As-of date: everything is recomputed using only data up to this date">
@@ -333,7 +385,7 @@ export default function App() {
             )}
 
             {q && lens === 'response' && !pop && (
-              <div className={`orb-card ${lvlKey(level)}`} role="status">
+              <div key={level} className={`orb-card ${lvlKey(level)}`} role="status">
                 <div className={`orb ${lvlKey(level)}`} aria-hidden="true">{LEVEL_ICON[level]}</div>
                 <div>
                   <div className={`lvl ${lvlKey(level)}`}>{level}</div>
@@ -365,9 +417,10 @@ export default function App() {
               </div>
               <div className={`replay-date ${lvlKey(level)}`}>
                 <span className={`mini-orb orb ${lvlKey(level)}`} />
-                <div><b>{niceDate(replayDate)}</b><span className={`status s-${lvlKey(level)}`} style={{ height: 22, fontSize: 11, padding: '0 8px', marginTop: 4 }}><span className="ico">{LEVEL_ICON[level]}</span>{level}</span></div>
+                <div><b key={replayDate} className="tick">{niceDate(replayDate)}</b><span className={`status s-${lvlKey(level)}`} style={{ height: 22, fontSize: 11, padding: '0 8px', marginTop: 4 }}><span className="ico">{LEVEL_ICON[level]}</span>{level}</span></div>
               </div>
               {shock && <div key={shock.key} className={`shock${shock.sev ? ' sev' : ''}`} />}
+              {cine && <div className="cine-card"><span className="tag">Replay · Corrientes</span><b>Would we have seen it coming?</b><span>1 Dec 2021 → 15 Mar 2022 · only data available on each day</span></div>}
               {flag && <div className="flag-pop">⚑ {flag}</div>}
               {replayDone && backtest && <EndCard bt={backtest} onAgain={() => runReplay()} onOwn={tryOwnArea} />}
             </>
@@ -379,11 +432,11 @@ export default function App() {
         <Boundary resetKey={lens + (q?.summary.as_of ?? '')}>{!q ? (
           <div className="panel"><div className="skeleton" /><div className="skeleton" /><div className="skeleton" /></div>
         ) : lens === 'response' ? (
-          <ResponsePanel q={q} ev={ev} bt={backtest} curMonth={curMonth} onReplay={() => runReplay()} onCard={() => setModal('card')} />
+          <ResponsePanel key="response" q={q} ev={ev} bt={backtest} curMonth={curMonth} onReplay={() => runReplay()} onCard={() => setModal('card')} />
         ) : lens === 'ranger' ? (
-          <RangerPanel q={q} raw={raw} setRaw={setRaw} selMonth={selMonth} onPick={pickMonth} calRef={calRef} onPng={() => exportPng(calRef.current, 'emberline_calendar.png')} />
+          <RangerPanel key="ranger" q={q} raw={raw} setRaw={setRaw} selMonth={selMonth} onPick={pickMonth} calRef={calRef} onPng={() => exportPng(calRef.current, 'emberline_calendar.png')} />
         ) : (
-          <ResearchPanel q={q} ev={ev} methods={methods} onCsv={exportCsv} onPng={() => exportPng(document.querySelector('.panel') as HTMLElement, 'emberline_research.png')} />
+          <ResearchPanel key="research" q={q} ev={ev} methods={methods} onCsv={exportCsv} onPng={() => exportPng(document.querySelector('.panel') as HTMLElement, 'emberline_research.png')} />
         )}</Boundary>
       </div>
 
@@ -419,7 +472,7 @@ export default function App() {
         </div>
       )}
       {modal === 'methods' && <MethodsDrawer q={q} methods={methods} bt={backtest} onClose={() => setModal(null)} />}
-      {intro && <Intro onChoose={choosePost} />}
+      {intro && <Intro onChoose={choosePost} coverage={coverage} det={det} />}
     </div>
   )
 }
@@ -451,7 +504,7 @@ function ResponsePanel({ q, ev, bt, curMonth, onReplay, onCard }: { q: QueryResu
       <div className="card">
         <div className="card-h"><h3>Now vs normal</h3><span className="right">days 1–{c.days_compared} of {c.month}</span></div>
         <div className="big-row">
-          <span className="big">{c.ratio != null ? `${c.ratio.toFixed(1)}×` : '—'}</span>
+          <span className="big"><CountUp value={c.ratio} digits={1} suffix="×" /></span>
           <span className="muted">the median{c.rank != null ? ` · rank ${c.rank} of ${c.n}` : ''}</span>
         </div>
         <div className="gauge" aria-label={`Now ${fmt(c.value)} vs median ${fmt(c.median)} burning cells`}>
@@ -481,7 +534,7 @@ function ResponsePanel({ q, ev, bt, curMonth, onReplay, onCard }: { q: QueryResu
       {bt && (
         <div className="card">
           <div className="card-h"><h3>Would we have seen it coming?</h3><span className="right">Corrientes 2022</span></div>
-          {verified?.days_after_episode_onset != null && <div className="big-row"><span className="big md">+{verified.days_after_episode_onset}</span><span className="muted">days before the verified decree</span></div>}
+          {verified?.days_after_episode_onset != null && <div className="big-row"><span className="big md"><CountUp value={verified.days_after_episode_onset} prefix="+" /></span><span className="muted">days before the verified decree</span></div>}
           <p className="sent">Rule fixed on 2003–2021. Severe in {bt.honesty.n_severe} of {bt.honesty.n_seasons} past seasons.</p>
           <button className="btn gold block" style={{ marginTop: 12 }} onClick={onReplay}><I d={IC.play} size={14} />Replay Corrientes 2022</button>
         </div>
@@ -593,7 +646,7 @@ function ResearchPanel({ q, ev, methods, onCsv, onPng }: { q: QueryResult; ev: E
 
       <div className="card">
         <div className="card-h"><h3>Who saw what</h3><span className="right">cell-days, 2012 →</span></div>
-        <div className="big-row"><span className="big md" style={{ color: '#8AB4F8', textShadow: 'none' }}>{share != null ? `${Math.round(share > 1 ? share : share * 100)}%` : '—'}</span><span className="muted">of MODIS cells also seen by VIIRS</span></div>
+        <div className="big-row"><span className="big md" style={{ color: '#8AB4F8', textShadow: 'none' }}><CountUp value={share == null ? null : Math.round(share > 1 ? share : share * 100)} suffix="%" /></span><span className="muted">of MODIS cells also seen by VIIRS</span></div>
         <WhoSawWhat q={q} />
         <div className="legend"><span><i className="sw" style={{ background: '#DCE6F7' }} />VIIRS only</span><span><i className="sw" style={{ background: '#8AB4F8' }} />Both</span><span><i className="sw" style={{ background: '#3A4253' }} />MODIS only</span></div>
       </div>
@@ -655,7 +708,7 @@ function EndCard({ bt, onAgain, onOwn }: { bt: Backtest; onAgain: () => void; on
   return (
     <div className="end-card" role="dialog" aria-label="Replay result">
       <span className="tag">Would we have seen it coming?</span>
-      <div className="huge">{lead != null ? `${lead >= 0 ? '+' : ''}${lead}` : '—'}<small>days</small></div>
+      <div className="huge"><CountUp value={lead} prefix={lead != null && lead >= 0 ? '+' : ''} /><small>days</small></div>
       <p className="sent" style={{ fontSize: 14 }}>From our sustained alert ({bt.result.episode_onset ? niceDate(bt.result.episode_onset) : '—'}) to the first verified emergency decree ({v ? niceDate(v.date) : '—'}).</p>
       <div className="tiles" style={{ marginTop: 14 }}>
         <div className="tile"><b>{bt.honesty.n_severe} / {bt.honesty.n_seasons}</b><span>past seasons reached Severe</span></div>
@@ -734,41 +787,6 @@ function MethodsDrawer({ q, methods, bt, onClose }: { q: QueryResult | null; met
         <h3>Data credits</h3>
         <p>We acknowledge the use of data and/or imagery from NASA's Fire Information for Resource Management System (FIRMS), part of NASA's Earth Science Data and Information System (ESDIS). MODIS C6.1 (MCD14ML / MCD14DL) and VIIRS 375 m (VNP14IMG, VJ114IMG, VJ214IMG) active-fire products. Boundaries: geoBoundaries (CC BY 4.0). Basemap: OpenFreeMap © OpenMapTiles © OpenStreetMap contributors.</p>
         <p className="muted">Built with AI assistance (Claude); no AI model computes any number shown.</p>
-      </div>
-    </div>
-  )
-}
-
-// ================================================================ intro (≤ 6 s, skippable)
-function Intro({ onChoose }: { onChoose: (l: Lens) => void }) {
-  const [out, setOut] = useState(false)
-  const go = (l: Lens) => { setOut(true); window.setTimeout(() => onChoose(l), 450) }
-  useEffect(() => { const k = (e: KeyboardEvent) => e.key === 'Escape' && go('response'); window.addEventListener('keydown', k); return () => window.removeEventListener('keydown', k) })
-  const icons: Record<Lens, string> = { response: IC.tower, ranger: IC.watch, research: IC.dome }
-  return (
-    <div className={`intro${out ? ' out' : ''}`} role="dialog" aria-label="Welcome">
-      <div className="stars" />
-      <svg className="tracks" viewBox="0 0 1200 120" preserveAspectRatio="none" aria-hidden="true">
-        <path d="M0 20 C300 20 450 60 620 60" stroke="#8A94A8" strokeOpacity=".5" />
-        <path d="M0 100 C300 100 450 60 620 60" stroke="#8AB4F8" strokeOpacity=".5" />
-        <path d="M620 60 H1200" stroke="#FB9B06" strokeOpacity=".7" style={{ animationDelay: '.8s' }} />
-      </svg>
-      <button className="btn skip" onClick={() => go('response')}>Skip ›</button>
-      <div className="center">
-        <div className="ember"><Logo size={44} /></div>
-        <div className="word">EMBERLINE</div>
-        <div className="tagline">25 years of fire. One clear line.</div>
-        <div className="choose">
-          <p>Choose your post</p>
-          <div className="posts">
-            {LENSES.map(l => (
-              <button key={l.id} className="post" style={{ ['--c' as any]: l.color }} onClick={() => go(l.id)}>
-                <div className="ic"><I d={icons[l.id]} size={22} /></div>
-                <b>{l.name}</b><span>{l.role}</span>
-              </button>
-            ))}
-          </div>
-        </div>
       </div>
     </div>
   )
