@@ -16,13 +16,14 @@ type Props = {
   onPin: (lat: number, lon: number) => void
   onModeDone: () => void
   fitKey?: string                // refit only when this changes
+  rings?: { lat: number; lon: number; label: string }[]   // ring hotspots (click to fly there)
 }
 
 // OpenFreeMap "dark" (free, no key). © OpenMapTiles © OpenStreetMap contributors
 const STYLE = 'https://tiles.openfreemap.org/styles/dark'
 const EMPTY = { type: 'FeatureCollection', features: [] } as any
 
-function rings(fc: any): number[][][] {
+function polyRings(fc: any): number[][][] {
   const out: number[][][] = []
   for (const f of fc?.features ?? []) {
     const g = f.geometry
@@ -32,7 +33,7 @@ function rings(fc: any): number[][][] {
   return out
 }
 
-export default function MapView({ coverage, aoi, detections, drawMode, accent, onDraw, onPin, onModeDone, fitKey }: Props) {
+export default function MapView({ coverage, aoi, detections, drawMode, accent, onDraw, onPin, onModeDone, fitKey, rings = [] }: Props) {
   const div = useRef<HTMLDivElement>(null)
   const map = useRef<maplibregl.Map | null>(null)
   const draw = useRef<TerraDraw | null>(null)
@@ -134,7 +135,7 @@ export default function MapView({ coverage, aoi, detections, drawMode, accent, o
   useEffect(() => {
     if (!ready || !coverage) return
     ;(map.current!.getSource('coverage') as maplibregl.GeoJSONSource).setData(coverage)
-    const holes = rings(coverage)
+    const holes = polyRings(coverage)
     ;(map.current!.getSource('mask') as maplibregl.GeoJSONSource).setData({
       type: 'Feature', properties: {},
       geometry: { type: 'Polygon', coordinates: [[[-180, -85], [180, -85], [180, 85], [-180, 85], [-180, -85]], ...holes.map(r => [...r].reverse())] },
@@ -194,6 +195,22 @@ export default function MapView({ coverage, aoi, detections, drawMode, accent, o
     if (!ready) return
     ;(map.current!.getSource('det') as maplibregl.GeoJSONSource).setData(fc)
   }, [ready, fc])
+
+  const ringKey = JSON.stringify(rings)
+  useEffect(() => {
+    if (!ready) return
+    const m = map.current!
+    const ms = rings.map(r => {
+      const el = document.createElement('button')
+      el.className = 'hot-ring'
+      el.setAttribute('aria-label', r.label)
+      el.innerHTML = `<i></i><span>${r.label}</span>`
+      el.addEventListener('click', ev => { ev.stopPropagation(); userMoved.current = true; m.flyTo({ center: [r.lon, r.lat], zoom: Math.max(m.getZoom(), 9), duration: 1400, essential: true }) })
+      return new maplibregl.Marker({ element: el }).setLngLat([r.lon, r.lat]).addTo(m)
+    })
+    return () => ms.forEach(x => x.remove())
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ready, ringKey])
 
   return <div ref={div} className="map" />
 }

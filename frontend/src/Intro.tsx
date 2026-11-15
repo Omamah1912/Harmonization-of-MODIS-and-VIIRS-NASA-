@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { Detections } from './types'
 import './intro.css'
+import { Topo } from './Hud'
 
 export type Lens = 'response' | 'ranger' | 'research'
 type Phase = 'sky' | 'parting' | 'world' | 'leaving'
@@ -126,14 +127,15 @@ export default function Intro({ onChoose, coverage, det }: { onChoose: (l: Lens)
       style={target ? ({ ['--fx' as any]: `${target.x}%`, ['--fy' as any]: `${target.y}%` }) : undefined}>
       {/* ---------------- world (behind the clouds) */}
       <div className="op-world">
-        <div className="op-stars" />
+        <div className="op-stars" /><Topo className="op-topo" seed={11} />
         <svg className="op-map" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMid meet" aria-hidden="true">
           <defs>
             <radialGradient id="opEmber"><stop offset="0" stopColor="#FCFFA4" /><stop offset=".35" stopColor="#FB9B06" stopOpacity=".9" /><stop offset="1" stopColor="#CF4446" stopOpacity="0" /></radialGradient>
+            <pattern id="opGrid" width="22" height="22" patternUnits="userSpaceOnUse"><path d="M22 0H0V22" fill="none" stroke="rgba(138,180,248,.13)" strokeWidth="1" /></pattern>
             <filter id="opGlow" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="6" /></filter>
           </defs>
           {geo && <>
-            <path d={geo.d} fill="#121a2a" />
+            <path d={geo.d} fill="#121a2a" /><path d={geo.d} fill="url(#opGrid)" />
             <path d={geo.d} fill="none" stroke="#FB9B06" strokeWidth="10" opacity=".25" filter="url(#opGlow)" />
             <path d={geo.d} fill="none" stroke="#8AB4F8" strokeWidth="4" opacity=".35" transform="translate(-5 2)" />
             <path d={geo.d} fill="none" stroke="#F7D13D" strokeWidth="1.6" className="op-outline" pathLength={1} />

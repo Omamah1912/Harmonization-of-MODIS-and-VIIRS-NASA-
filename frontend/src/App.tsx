@@ -4,9 +4,11 @@ import { ApiError, downloadCsv, get, post } from './api'
 import { AnnualAnomaly, BridgeFactors, ember, EmberCalendar, FireClock, fmt, MonthlyAnomalyGrid, MONTHS, SeamSplitter, SeasonBars, WhoSawWhat } from './charts'
 import { MainDock, ReplayDock } from './Dock'
 import Intro from './Intro'
+import { Corners, RingButton, Topo } from './Hud'
 import MapView, { type DrawMode } from './MapView'
 import type { AOI, Backtest, Detections, EventsResult, Filters, Geometry, Methods, Preset, QueryResult, ReplayResult, Status } from './types'
 import './App.css'
+import './blueprint.css'
 
 type Lens = 'response' | 'ranger' | 'research'
 type AoiSel = { kind: 'preset'; id: string } | { kind: 'geom'; geom: Geometry } | { kind: 'circle'; lat: number; lon: number; radius_km: number }
@@ -296,6 +298,7 @@ export default function App() {
 
   return (
     <div className={`app lens-${lens}${replayMode ? ' replay' : ''}${entering ? ' entering' : ''}${loading ? ' is-loading' : ''}${intro ? ' behind-intro' : ''}`}>
+      <Topo /><div className="sgrid" aria-hidden="true" /><div className="grain" aria-hidden="true" />
       {/* ------------------------------------------------------ top bar */}
       <header className="topbar">
         <div className="tb-left">
@@ -322,10 +325,18 @@ export default function App() {
       <div className="body">
         <section className="stage" aria-label="Map">
           {loading && <div className="loading-bar" />}
+          <div className="blueprint" aria-hidden="true" /><Corners />
           <MapView coverage={coverage} aoi={aoiGeom} detections={det} drawMode={drawMode} accent={lensColor} fitKey={fitKey + lens}
             onDraw={g => { if (replayMode) exitReplay(); setSelMonth(null); setAoiSel({ kind: 'geom', geom: g }) }}
             onPin={(lat, lon) => { setPin(p => ({ ...p, lat: String(lat), lon: String(lon) })); if (replayMode) exitReplay(); setSelMonth(null); setAoiSel({ kind: 'circle', lat, lon, radius_km: pin.r }) }}
-            onModeDone={() => setDrawMode('none')} />
+            onModeDone={() => setDrawMode('none')}
+            rings={(lens === 'response' || replayMode) && ev?.current ? [{ lat: ev.current.centroid_lat, lon: ev.current.centroid_lon, label: `Fire #${fmt(ev.current.rank_footprint)} · ${fmt(ev.current.footprint_km2)} km²` }] : []} />
+          {!replayMode && lens !== 'research' && (
+            <div className="stage-title" key={lens} aria-hidden="true">
+              <span className="kicker">{LENSES.find(l => l.id === lens)!.name}</span>
+              <span className="word">{LENSES.find(l => l.id === lens)!.role}</span>
+            </div>
+          )}
 
           {!replayMode && <>
             <div className="rail" role="toolbar" aria-label="Area tools">
@@ -443,9 +454,9 @@ export default function App() {
       {/* ------------------------------------------------------ timeline dock */}
       <footer className="dock">
         {replayMode
-          ? (playing ? <button className="btn gold play" onClick={pause}><I d={IC.pause} size={14} />Pause</button>
-            : <button className="btn gold play" onClick={() => runReplay(replayDone ? REPLAY_START : addDays(replayDate, REPLAY_STEP_DAYS))}><I d={IC.play} size={14} />{replayDone ? 'Again' : 'Play'}</button>)
-          : <button className="btn gold play" onClick={() => runReplay()} title="Replay Corrientes 2022"><I d={IC.play} size={14} />Replay</button>}
+          ? (playing ? <RingButton gold progress={((Date.parse(replayDate) - Date.parse(REPLAY_START)) / (Date.parse(REPLAY_END) - Date.parse(REPLAY_START)))} onClick={pause} label="Pause"><I d={IC.pause} size={16} /></RingButton>
+            : <RingButton gold progress={replayDone ? 1 : ((Date.parse(replayDate) - Date.parse(REPLAY_START)) / (Date.parse(REPLAY_END) - Date.parse(REPLAY_START)))} onClick={() => runReplay(replayDone ? REPLAY_START : addDays(replayDate, REPLAY_STEP_DAYS))} label={replayDone ? 'Again' : 'Play'}><I d={IC.play} size={16} /></RingButton>)
+          : <RingButton gold progress={0} onClick={() => runReplay()} label="Replay 2022"><I d={IC.play} size={16} /></RingButton>}
         {replayMode && backtest ? <ReplayDock bt={backtest} start={REPLAY_START} end={REPLAY_END} cur={replayDate} />
           : q ? <MainDock cells={q.calendar_monthly} asOf={q.summary.as_of} lastDay={q.summary.last_observed_day > q.summary.as_of ? q.summary.last_observed_day : q.summary.as_of} windows={q.critical_windows.windows} selected={selMonth}
             onScrub={d => { setSelMonth(null); setAsOf(d >= (q.summary.last_observed_day ?? d) ? '' : d) }} /> : <div />}
