@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import io
 import json
+import re
 import threading
 import time
 from collections import OrderedDict
@@ -15,7 +16,7 @@ import numpy as np
 import pandas as pd
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse, StreamingResponse
+from fastapi.responses import JSONResponse, Response, StreamingResponse
 from pydantic import BaseModel, Field
 
 from backend.app import aoi as A
@@ -87,6 +88,20 @@ class Store:
             self._cd[variant] = self._with_cidx(pd.read_parquet(p))
         return self._cd[variant]
 
+    _det: pd.DataFrame | None = None
+
+    def det(self) -> pd.DataFrame:
+        """Detections for the map, held in memory sorted by solar_date (loaded on first use)."""
+        if self._det is None:
+            d = pd.read_parquet(self.det_path, columns=["sensor", "platform", "lat", "lon", "solar_date", "frp", "conf_class", "type", "daynight"])
+            d["cell_id"] = (np.floor(d["lat"] / C.CELL_DEG).astype("int64").astype(str) + "_"
+                            + np.floor(d["lon"] / C.CELL_DEG).astype("int64").astype(str))
+            d = self._with_cidx(d).drop(columns="cell_id")
+            d["solar_date"] = pd.to_datetime(d["solar_date"]).dt.date
+            self._det = d.sort_values("solar_date", ascending=False, kind="stable").reset_index(drop=True)
+            self._det_dates = np.array([x.toordinal() for x in self._det["solar_date"]])[::-1]  # ascending ordinals
+        return self._det
+
     def mask(self, ids: set) -> np.ndarray:
         m = np.zeros(len(self.cells) + 1, dtype=bool)   # last slot = "not in grid" (cidx -1)
         m[self.cell_index.get_indexer(list(ids))] = True
@@ -127,6 +142,22 @@ class ReplayBody(BaseModel):
 
 
 # ------------------------------------------------------------------ helpers
+def fast_json(obj) -> Response:
+    """Serialize directly (skips FastAPI's recursive jsonable_encoder, slow on 0.5 MB payloads)."""
+    def conv(o):
+        if isinstance(o, np.generic):
+            v = o.item()
+            return None if isinstance(v, float) and not np.isfinite(v) else v
+        return str(o)  # dates
+    txt = json.dumps(obj, default=conv, allow_nan=True, separators=(",", ":"))
+    # missing ≠ zero: any NaN/inf left in the payload is sent as null (bare tokens only, never inside strings)
+    txt = _NAN_TOKEN.sub(lambda m: m.group(1) + "null", txt)
+    return Response(txt, media_type="application/json")
+
+
+_NAN_TOKEN = re.compile(r'([\[,:])(?:NaN|-?Infinity)(?=[,\]}])')
+
+
 _CACHE: OrderedDict[str, dict] = OrderedDict()
 
 
@@ -139,7 +170,7 @@ def _cache_get(key):
 
 def _cache_put(key, val):
     _CACHE[key] = val
-    while len(_CACHE) > 64:
+    while len(_CACHE) > 160:
         _CACHE.popitem(last=False)
 
 
@@ -285,6 +316,11 @@ def warm() -> None:
             presets()
             geom = json.loads(s.province.to_json())["features"][0]["geometry"]
             compute(QueryBody(aoi=geom, start=date(2001, 1, 1)))
+            s.det()
+            # the "Replay Corrientes 2022" demo path: same dates as the frontend stepping (every 3 days from 1 Dec 2021)
+            for i in range(35):
+                replay(ReplayBody(aoi=geom, as_of=date.fromordinal(date(2021, 12, 1).toordinal() + 3 * i)))
+            print("warm-up done (query, detections, 35 replay dates)", flush=True)
         except Exception as e:  # noqa: BLE001
             print("warm-up failed:", e)
     threading.Thread(target=_w, daemon=True).start()
@@ -305,7 +341,7 @@ def presets():
 
 @app.post("/api/query")
 def query(body: QueryBody):
-    return public(compute(body))
+    return fast_json(public(compute(body)))
 
 
 @app.post("/api/events")
@@ -313,12 +349,16 @@ def events(body: QueryBody):
     s = store()
     res = compute(body)
     as_of = date.fromisoformat(res["summary"]["as_of"])
-    return events_for(res["_ids"], res["_v"], as_of, date.fromisoformat(res["summary"]["start"]),
-                      date.fromisoformat(res["summary"]["end"]))
+    return fast_json(events_for(res["_ids"], res["_v"], as_of, date.fromisoformat(res["summary"]["start"]),
+                                date.fromisoformat(res["summary"]["end"])))
 
 
 @app.post("/api/replay")
 def replay(body: ReplayBody):
+    key = "replay:" + body.model_dump_json()
+    hit = _cache_get(key)
+    if hit is not None:
+        return Response(hit, media_type="application/json")
     s = store()
     as_of = min(body.as_of, s.last_day)
     start = date.fromordinal(as_of.toordinal() - body.window_days)
@@ -337,7 +377,9 @@ def replay(body: ReplayBody):
         "markers": C.OFFICIAL_MARKERS,
     }
     out["events"] = events_for(res["_ids"], res["_v"], as_of)
-    return out
+    r = fast_json(out)
+    _cache_put(key, r.body)
+    return r
 
 
 @app.get("/api/backtest/corrientes-2022")
@@ -412,27 +454,26 @@ def detections(body: QueryBody):
     if body.as_of:
         end = min(end, body.as_of)
     f = body.filters
-    conf = ("'nominal','high'" if f.min_conf == "nominal" else "'low','nominal','high'")
-    where = [f"conf_class IN ({conf})", "solar_date BETWEEN ? AND ?"]
+    d = s.det()
+    n = len(d)
+    # rows are sorted by date descending; ascending ordinals let us binary-search the date window
+    lo = n - np.searchsorted(s._det_dates, end.toordinal(), side="right")
+    hi = n - np.searchsorted(s._det_dates, start.toordinal(), side="left")
+    w = d.iloc[lo:hi]
+    keep = s.mask(ids)[w["cidx"].to_numpy()]
+    keep &= w["conf_class"].isin(["nominal", "high"] if f.min_conf == "nominal" else ["low", "nominal", "high"]).to_numpy()
     if not f.include_static:
-        where.append("(type IS NULL OR type = 0)")
+        keep &= (w["type"].isna() | (w["type"] == 0)).to_numpy()
     if f.daynight != "all":
-        where.append(f"daynight = '{f.daynight}'")
-    con = duckdb.connect()
-    con.register("aoi_cells", pd.DataFrame({"cell_id": list(ids)}))
-    df = con.execute(f"""
-      WITH d AS (SELECT sensor, platform, lat, lon, solar_date, frp,
-          CAST(floor(lat / {C.CELL_DEG}) AS BIGINT) || '_' || CAST(floor(lon / {C.CELL_DEG}) AS BIGINT) AS cell_id
-        FROM read_parquet('{s.det_path}') WHERE {' AND '.join(where)})
-      SELECT d.* FROM d JOIN aoi_cells USING (cell_id) ORDER BY solar_date DESC LIMIT {MAX_POINTS + 1}""",
-                     [start, end]).df()
+        keep &= (w["daynight"] == f.daynight).to_numpy()
+    df = w[keep].head(MAX_POINTS + 1)
     truncated = len(df) > MAX_POINTS
     df = df.head(MAX_POINTS)
     feats = [{"type": "Feature", "geometry": {"type": "Point", "coordinates": [round(r.lon, 4), round(r.lat, 4)]},
               "properties": {"sensor": r.sensor, "platform": r.platform, "date": str(r.solar_date),
                              "frp": _f(r.frp, 1)}} for r in df.itertuples()]
-    return {"type": "FeatureCollection", "features": feats, "start": str(start), "end": str(end),
-            "truncated": truncated, "n": len(feats)}
+    return fast_json({"type": "FeatureCollection", "features": feats, "start": str(start), "end": str(end),
+                      "truncated": truncated, "n": len(feats)})
 
 
 def mount_frontend() -> None:

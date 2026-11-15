@@ -74,8 +74,8 @@ export type ReplayResult = QueryResult & {
 
 export type Backtest = {
   rule: Record<string, unknown>; aoi: string; season: { start: string; end: string }
-  result: { first_alert: string | null; first_severe: string | null; alert_days: number; severe_days: number; no_data_days: number; peak_S: number | null; peak_S_date: string | null }
-  markers: (Marker & { days_after_first_alert: number | null; days_after_first_severe: number | null })[]
+  result: { first_alert: string | null; first_severe: string | null; alert_days: number; severe_days: number; no_data_days: number; peak_S: number | null; peak_S_date: string | null; episode_onset?: string | null }
+  markers: (Marker & { days_after_first_alert: number | null; days_after_first_severe: number | null; days_after_episode_onset?: number | null })[]
   honesty: { seasons: { season: string; alert: boolean; severe: boolean; first_alert: string | null; first_severe: string | null }[]; n_seasons: number; n_alert: number; n_severe: number; sentence: string; note: string }
   timeline: { date: string; H: number | null; S: number | null; P90: number | null; P99: number | null; alert: boolean; severe: boolean; status: string }[]
   reported_official: { fact: string; label: string; verified: boolean; source_url: string }[]
