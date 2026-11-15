@@ -2,6 +2,8 @@
 
 NASA Space Apps Challenge 2026 · *Harmonization of MODIS and VIIRS Hot Spots* (CONAE)
 
+**Live app: https://emberline-mauve.vercel.app** · API: https://emberline-api-production.up.railway.app/api/health
+
 **What it is.** A web app that turns 25 years of NASA FIRMS active-fire detections from two different
 satellite sensors (MODIS 1 km, since 2000; VIIRS 375 m, since 2012) into one consistent,
 sensor-independent record of burning activity, so that "the sensor of origin no longer matters".
@@ -62,10 +64,14 @@ Tests: `pytest backend/tests pipeline/tests`.
 
 ## Deploy
 
-- API (+ app): Hugging Face Docker Space — `python deploy/hf_space.py <user>/emberline` (needs `HF_TOKEN`).
-- Frontend only: Vercel — build with `VITE_API_URL=https://<user>-emberline.hf.space`.
+- **API: Railway** (Docker, `backend/Dockerfile`, config in `railway.json`; service variable
+  `RAILWAY_DOCKERFILE_PATH=backend/Dockerfile`). Deploy with `railway up --service emberline-api`.
+  Peak memory is about 550 MB (bounded response cache).
+- **Frontend: Vercel** (static). Build with `VITE_API_URL=https://emberline-api-production.up.railway.app npm run build`
+  and deploy `frontend/dist`.
 - If the API is slow or down, the frontend falls back to precomputed results for the preset areas
   (`frontend/public/fallback/`) and shows a **cached** badge.
+- Local one-command backup: `cd frontend && npm run build`, then `uvicorn backend.app.main:app --port 8000`.
 
 ## Repository
 
