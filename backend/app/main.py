@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import io
 import json
+import os
 import re
 import threading
 import time
@@ -98,6 +99,8 @@ class Store:
                             + np.floor(d["lon"] / C.CELL_DEG).astype("int64").astype(str))
             d = self._with_cidx(d).drop(columns="cell_id")
             d["solar_date"] = pd.to_datetime(d["solar_date"]).dt.date
+            for c in ("sensor", "platform", "conf_class", "daynight"):
+                d[c] = d[c].astype("category")   # ~40x smaller than repeated strings
             self._det = d.sort_values("solar_date", ascending=False, kind="stable").reset_index(drop=True)
             self._det_dates = np.array([x.toordinal() for x in self._det["solar_date"]])[::-1]  # ascending ordinals
         return self._det
@@ -159,6 +162,7 @@ _NAN_TOKEN = re.compile(r'([\[,:])(?:NaN|-?Infinity)(?=[,\]}])')
 
 
 _CACHE: OrderedDict[str, dict] = OrderedDict()
+_CACHE_MAX = int(os.environ.get("EMBERLINE_CACHE_MAX", "48"))  # bounded: each entry holds result tables
 
 
 def _cache_get(key):
@@ -170,7 +174,7 @@ def _cache_get(key):
 
 def _cache_put(key, val):
     _CACHE[key] = val
-    while len(_CACHE) > 160:
+    while len(_CACHE) > _CACHE_MAX:
         _CACHE.popitem(last=False)
 
 
