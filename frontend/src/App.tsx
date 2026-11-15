@@ -256,7 +256,7 @@ export default function App() {
     while (playRef.current && d <= REPLAY_END) {
       setAsOf(d)
       try { await replayAt(d) } catch (e: any) { say(e.message); break }
-      await new Promise(res => setTimeout(res, 550))
+      await new Promise(res => setTimeout(res, 300))
       d = addDays(d, REPLAY_STEP_DAYS)
     }
     if (playRef.current) setReplayDone(true)
